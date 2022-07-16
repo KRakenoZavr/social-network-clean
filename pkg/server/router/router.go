@@ -27,7 +27,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (r *Router) HandleFunc(path string, f http.HandlerFunc) *Route {
 	reg := toRegexp(path)
-	route := NewRoute(reg, f)
+	route := NewRoute(reg, path, f)
 	r.routes = append(r.routes, route)
 
 	context.append(route.reg, reg.SubexpNames()...)
@@ -41,7 +41,7 @@ func (r *Router) PathPrefix(prefix string) *Route {
 		log.Fatal(err)
 	}
 
-	route := NewRoute(reg, nil)
+	route := NewRoute(reg, "", nil)
 	r.routes = append(r.routes, route)
 
 	return route
@@ -74,4 +74,12 @@ func toRegexp(path string) *regexp.Regexp {
 	}
 
 	return reg
+}
+
+func (r *Router) GetPathes() []string {
+	pathes := []string{}
+	for _, route := range r.routes {
+		pathes = append(pathes, route.path)
+	}
+	return pathes
 }

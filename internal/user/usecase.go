@@ -3,5 +3,5 @@ package user
 import "mux/internal/models"
 
 type UseCase interface {
-	Create(user *models.User) error
+	Create(*models.User) error
 }

@@ -13,6 +13,7 @@ import (
 	"mux/pkg/db/sqlite"
 	"mux/pkg/server/controller"
 	"mux/pkg/server/router"
+	"mux/pkg/utils"
 )
 
 type Server struct {
@@ -40,7 +41,7 @@ func (s *Server) Start(port string) error {
 
 	server := &http.Server{
 		Addr:    port,
-		Handler: c.Logging(s.router),
+		Handler: c.Logging(s.other(s.router)),
 	}
 
 	return server.ListenAndServe()
@@ -59,4 +60,15 @@ func (s *Server) configureRouter() {
 	userHandlers := userHttp.NewUserHandlers(userUC, handlersLogger)
 
 	userHttp.MapUserRoutes(s.router, userHandlers)
+}
+
+func (s *Server) other(hdlr http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pathes := s.router.GetPathes()
+		if !utils.Contains(pathes, r.URL.Path) {
+			w.WriteHeader(http.StatusNotFound)
+		}
+
+		hdlr.ServeHTTP(w, r)
+	})
 }

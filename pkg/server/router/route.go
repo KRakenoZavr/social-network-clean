@@ -8,11 +8,12 @@ import (
 type Route struct {
 	methods []string
 	reg     *regexp.Regexp
+	path    string
 	handler http.Handler
 }
 
-func NewRoute(reg *regexp.Regexp, h http.Handler) *Route {
-	return &Route{reg: reg, handler: h}
+func NewRoute(reg *regexp.Regexp, path string, h http.Handler) *Route {
+	return &Route{reg: reg, path: path, handler: h}
 }
 
 func (r *Route) Handle(h http.Handler) {

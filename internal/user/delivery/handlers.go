@@ -24,13 +24,13 @@ func (h userHandlers) Create() http.HandlerFunc {
 		rBody := &models.User{}
 		err := json.NewDecoder(r.Body).Decode(&rBody)
 		if err != nil {
-			errors.ErrorResponse(h.logger, w, http.StatusBadRequest, err)
+			errors.ErrorResponse(w, http.StatusBadRequest, err)
 			return
 		}
 
 		err = h.userUC.Create(rBody)
 		if err != nil {
-			errors.ErrorResponse(h.logger, w, http.StatusBadRequest, err)
+			errors.ErrorResponse(w, http.StatusBadRequest, err)
 			return
 		}
 
