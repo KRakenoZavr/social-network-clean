@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	port := ":3001"
+	port := ":3000"
 
 	server := internal.NewServer()
 	server.Start(port)
