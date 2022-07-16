@@ -1,5 +1,5 @@
 CREATE TABLE users(
-  user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id VARCHAR(30) PRIMARY KEY NOT NULL,
   email         VARCHAR(50)   NOT NULL,
   password      VARCHAR(50)   NOT NULL,
   first_name    VARCHAR(50)   NOT NULL,
@@ -9,12 +9,4 @@ CREATE TABLE users(
   avatar        VARCHAR(255),
   nickname      VARCHAR(50),
   about         VARCHAR(255)
-);
-
-CREATE TABLE user(
-  user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username    VARCHAR(50)     NOT NULL,
-  name        VARCHAR(50)     NOT NULL,
-  password    VARCHAR(50)     NOT NULL,
-  age         INTEGER         NOT NULL
 );

@@ -46,8 +46,6 @@ func (s *Server) Start(port string) error {
 }
 
 func (s *Server) configureRouter() {
-	// usersController := users.NewUserController()
-
 	handlerLogger := logger.HandlersLogger()
 
 	// init repo
@@ -60,5 +58,4 @@ func (s *Server) configureRouter() {
 	userHandlers := userHttp.NewUserHandlers(userUC, handlerLogger)
 
 	userHttp.MapUserRoutes(s.router, userHandlers)
-	// s.router.HandleFunc("/", usersController.CreateUser).Methods("POST")
 }

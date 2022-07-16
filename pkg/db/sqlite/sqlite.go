@@ -2,7 +2,10 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 	"log"
 	"os"
 
@@ -28,7 +31,6 @@ func CreateDB() *sql.DB {
 		log.Fatalf("Cannot open db, err: %s", err)
 	}
 
-	/*
 	// create sqilte driver
 	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{})
 	if err != nil {
@@ -60,7 +62,6 @@ func CreateDB() *sql.DB {
 			log.Fatalf("Cannot migrate up, err: %s", err)
 		}
 	}
-	 */
 
 	return db
 }

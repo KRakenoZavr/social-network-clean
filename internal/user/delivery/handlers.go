@@ -1,7 +1,10 @@
 package delivery
 
 import (
+	"encoding/json"
 	"log"
+	"mux/internal/models"
+	"mux/pkg/utils/errors"
 	"net/http"
 
 	"mux/internal/user"
@@ -18,6 +21,19 @@ func NewUserHandlers(u user.UseCase, l *log.Logger) user.Handlers {
 
 func (h userHandlers) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		h.logger.Println("asd")
+		rBody := &models.User{}
+		err := json.NewDecoder(r.Body).Decode(&rBody)
+		if err != nil {
+			errors.ErrorResponse(h.logger, w, http.StatusBadRequest, err)
+			return
+		}
+
+		err = h.userUC.Create(rBody)
+		if err != nil {
+			errors.ErrorResponse(h.logger, w, http.StatusBadRequest, err)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
 	}
 }
