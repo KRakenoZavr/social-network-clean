@@ -2,12 +2,18 @@ package errors
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 )
 
+var (
+	ErrMethodMismatch = errors.New("method is not allowed")
+	ErrNotFound       = errors.New("no matching route was found")
+)
+
 type ErrResponse struct {
-	Code int
+	Code    int
 	Message string
 }
 
