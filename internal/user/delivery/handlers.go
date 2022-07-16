@@ -15,8 +15,8 @@ type userHandlers struct {
 	logger *log.Logger
 }
 
-func NewUserHandlers(u user.UseCase, l *log.Logger) user.Handlers {
-	return &userHandlers{userUC: u, logger: l}
+func NewUserHandlers(userUC user.UseCase, logger *log.Logger) user.Handlers {
+	return &userHandlers{userUC: userUC, logger: logger}
 }
 
 func (h userHandlers) Create() http.HandlerFunc {
@@ -24,12 +24,14 @@ func (h userHandlers) Create() http.HandlerFunc {
 		rBody := &models.User{}
 		err := json.NewDecoder(r.Body).Decode(&rBody)
 		if err != nil {
+			h.logger.Println(err.Error())
 			errors.ErrorResponse(w, http.StatusBadRequest, err)
 			return
 		}
 
 		err = h.userUC.Create(rBody)
 		if err != nil {
+			h.logger.Println(err.Error())
 			errors.ErrorResponse(w, http.StatusBadRequest, err)
 			return
 		}

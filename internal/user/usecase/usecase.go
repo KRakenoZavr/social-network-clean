@@ -12,8 +12,8 @@ type userUC struct {
 	logger   *log.Logger
 }
 
-func NewUserUseCase(u user.Repository, logger *log.Logger) user.UseCase {
-	return &userUC{userRepo: u, logger: logger}
+func NewUserUseCase(userRepo user.Repository, logger *log.Logger) user.UseCase {
+	return &userUC{userRepo: userRepo, logger: logger}
 }
 
 func (u *userUC) Create(user *models.User) error {

@@ -22,6 +22,7 @@ func NewUserRepository(db *sql.DB, logger *log.Logger) user.Repository {
 
 func (r *usersRepo) Create(user *models.User) error {
 	id := uuid.NewV4()
+
 	query, err := r.db.Prepare(createUser)
 	if err != nil {
 		return err
@@ -32,9 +33,11 @@ func (r *usersRepo) Create(user *models.User) error {
 		return err
 	}
 
-	_, err = tx.Stmt(query).Exec(id, user.Username, user.Name, user.Password, user.Age)
+	_, err = tx.Stmt(query).Exec(id, user.Email, user.Password,
+		user.FName, user.LName, user.DateOfBirth, user.IsPrivate,
+		user.Avatar, user.NickName, user.About)
 	if err != nil {
-		log.Println("doing rollback")
+		r.logger.Println("doing rollback")
 		tx.Rollback()
 	} else {
 		tx.Commit()
