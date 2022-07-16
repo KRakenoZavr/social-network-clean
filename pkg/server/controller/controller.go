@@ -2,15 +2,14 @@ package controller
 
 import (
 	"log"
+	"mux/pkg/colors"
+	logger2 "mux/pkg/logger"
 	"net/http"
-	"os"
 	"time"
-
-	colors "mux/pkg/server/colors"
 )
 
 func NewController() *Controller {
-	logger := log.New(os.Stdout, colors.CLIBlue, log.LstdFlags)
+	logger := logger2.ServerLogger()
 
 	return &Controller{Logger: logger}
 }

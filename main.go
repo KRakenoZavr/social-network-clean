@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 
-	"mux/pkg/internal"
+	"mux/internal"
 )
 
 var (

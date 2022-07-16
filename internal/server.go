@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"mux/internal/db/sqlite"
-	"mux/internal/users"
+	userHttp "mux/internal/user/delivery"
+	userRepository "mux/internal/user/repository"
+	userUseCase "mux/internal/user/usecase"
+	"mux/pkg/db/sqlite"
 	"mux/pkg/server/controller"
 	"mux/pkg/server/router"
 )
@@ -44,7 +46,15 @@ func (s *Server) Start(port string) error {
 
 func (s *Server) configureRouter() {
 	// usersController := users.NewUserController()
-	uRepo = users.NewUserRepository(s.db)
+	// init repo
+	userRepo := userRepository.NewUserRepository(s.db)
 
+	// init usecase
+	userUC := userUseCase.NewUserUseCase(userRepo)
+
+	// init handler
+	userHandlers := userHttp.NewUserHandlers(userUC)
+
+	userHttp.MapUserRoutes(s.router, userHandlers)
 	// s.router.HandleFunc("/", usersController.CreateUser).Methods("POST")
 }

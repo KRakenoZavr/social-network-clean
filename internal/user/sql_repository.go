@@ -1,4 +1,4 @@
-package users
+package user
 
 type Repository interface {
 	Create()
