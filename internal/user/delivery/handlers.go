@@ -9,14 +9,15 @@ import (
 
 type userHandlers struct {
 	userUC user.UseCase
+	logger *log.Logger
 }
 
-func NewUserHandlers(u user.UseCase) user.Handlers {
-	return &userHandlers{userUC: u}
+func NewUserHandlers(u user.UseCase, l *log.Logger) user.Handlers {
+	return &userHandlers{userUC: u, logger: l}
 }
 
 func (h userHandlers) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("asd")
+		h.logger.Println("asd")
 	}
 }

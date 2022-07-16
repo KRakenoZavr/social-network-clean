@@ -3,6 +3,7 @@ package internal
 import (
 	"database/sql"
 	"fmt"
+	"mux/pkg/logger"
 	"net/http"
 
 	userHttp "mux/internal/user/delivery"
@@ -46,6 +47,9 @@ func (s *Server) Start(port string) error {
 
 func (s *Server) configureRouter() {
 	// usersController := users.NewUserController()
+
+	handlerLogger := logger.HandlersLogger()
+
 	// init repo
 	userRepo := userRepository.NewUserRepository(s.db)
 
@@ -53,7 +57,7 @@ func (s *Server) configureRouter() {
 	userUC := userUseCase.NewUserUseCase(userRepo)
 
 	// init handler
-	userHandlers := userHttp.NewUserHandlers(userUC)
+	userHandlers := userHttp.NewUserHandlers(userUC, handlerLogger)
 
 	userHttp.MapUserRoutes(s.router, userHandlers)
 	// s.router.HandleFunc("/", usersController.CreateUser).Methods("POST")

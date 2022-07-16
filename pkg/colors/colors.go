@@ -1,9 +1,10 @@
 package colors
 
-var (
+const (
 	CLIClear = "\033[0m"
 	CLIBlue  = "\033[36m"
 	CLIRed = "\033[31m"
+	CLIPurple = "\033[35m"
 )
 
 //

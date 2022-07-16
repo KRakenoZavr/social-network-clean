@@ -7,9 +7,9 @@ import (
 )
 
 func ServerLogger() *log.Logger {
-	return log.New(os.Stdout, colors.CLIBlue, log.LstdFlags)
+	return log.New(os.Stdout, colors.CLIPurple, log.LstdFlags)
 }
 
 func HandlersLogger() *log.Logger {
-	return log.New(os.Stdout, colors.CLIRed, log.LstdFlags|log.Llongfile)
+	return log.New(os.Stdout, colors.CLIBlue, log.LstdFlags|log.Llongfile)
 }

@@ -2,23 +2,20 @@ package sqlite
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const DB_NAME = "social.db"
+const DbName = "social.db"
 
 func CreateDB() *sql.DB {
 	// create social.db if not exists
-	if _, err := os.Stat(DB_NAME); os.IsNotExist(err) {
-		_, err = os.Create(DB_NAME)
+	if _, err := os.Stat(DbName); os.IsNotExist(err) {
+		_, err = os.Create(DbName)
 		if err != nil {
 			log.Fatalf("Cannot create db file, err: %s", err)
 		}
@@ -26,11 +23,12 @@ func CreateDB() *sql.DB {
 	}
 
 	// open database with foreign keys on
-	db, err := sql.Open("sqlite3", fmt.Sprintf("%s?_foreign_keys=on", DB_NAME))
+	db, err := sql.Open("sqlite3", fmt.Sprintf("%s?_foreign_keys=on", DbName))
 	if err != nil {
 		log.Fatalf("Cannot open db, err: %s", err)
 	}
 
+	/*
 	// create sqilte driver
 	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{})
 	if err != nil {
@@ -62,6 +60,7 @@ func CreateDB() *sql.DB {
 			log.Fatalf("Cannot migrate up, err: %s", err)
 		}
 	}
+	 */
 
 	return db
 }
