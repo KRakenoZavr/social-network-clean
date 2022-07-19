@@ -1,7 +1,10 @@
 package user
 
-import "mux/internal/models"
+import (
+	"mux/internal/models"
+	"mux/pkg/utils/errHandler"
+)
 
 type UseCase interface {
-	Create(*models.User) error
+	Create(*models.User) *errHandler.ServiceError
 }

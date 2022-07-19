@@ -38,6 +38,7 @@ func (r *usersRepo) Create(user *models.User) error {
 		user.Avatar, user.NickName, user.About)
 	if err != nil {
 		r.logger.Println("doing rollback")
+		r.logger.Println(err.Error())
 		tx.Rollback()
 	} else {
 		tx.Commit()

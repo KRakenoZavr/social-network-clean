@@ -3,7 +3,7 @@ package middleware
 import (
 	"errors"
 	"log"
-	errorHandler "mux/pkg/utils/errors"
+	"mux/pkg/utils/errHandler"
 	"net/http"
 )
 
@@ -15,7 +15,7 @@ type (
 func checkAuth(c *http.Cookie) error {
 	c.Expires.Add(5 * 60 * 1000)
 	if false {
-		return errors.New("asd")
+		return errors.New("not authed")
 	}
 	return nil
 }
@@ -25,13 +25,13 @@ func CheckAuth(hdlr http.Handler) http.Handler {
 		cookie, err := r.Cookie("secret")
 		if err != nil {
 			log.Println("error accessing cookie", err.Error())
-			errorHandler.ErrorResponse(w, http.StatusInternalServerError, errors.New("error accessing cookie"))
+			errHandler.ErrorResponse(w, http.StatusInternalServerError, errors.New("error accessing cookie"), []string{})
 			return
 		}
 
 		err = checkAuth(cookie)
 		if err != nil {
-			errorHandler.ErrorResponse(w, http.StatusUnauthorized, errors.New("you should authorize"))
+			errHandler.ErrorResponse(w, http.StatusUnauthorized, errors.New("you should authorize"), []string{})
 			return
 		}
 

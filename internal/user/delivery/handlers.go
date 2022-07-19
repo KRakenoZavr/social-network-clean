@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"mux/internal/models"
-	"mux/pkg/utils/errors"
+	"mux/pkg/utils/errHandler"
 	"net/http"
 
 	"mux/internal/user"
@@ -25,14 +25,14 @@ func (h userHandlers) Create() http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&rBody)
 		if err != nil {
 			h.logger.Println(err.Error())
-			errors.ErrorResponse(w, http.StatusBadRequest, err)
+			errHandler.ErrorResponse(w, http.StatusBadRequest, err, []string{})
 			return
 		}
 
-		err = h.userUC.Create(rBody)
-		if err != nil {
-			h.logger.Println(err.Error())
-			errors.ErrorResponse(w, http.StatusBadRequest, err)
+		sError := h.userUC.Create(rBody)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
 			return
 		}
 
