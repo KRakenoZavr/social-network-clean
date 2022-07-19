@@ -21,8 +21,8 @@ func NewUserUseCase(groupRepo group.Repository, logger *log.Logger) group.UseCas
 
 func (u *groupUC) validateUser(group *models.Group) []error {
 	validator := utils.NewValidator()
-	validator.CheckNull(group.Title, "email")
-	validator.CheckNull(group.Body, "first name")
+	validator.CheckNull(group.Title, "title")
+	validator.CheckNull(group.Body, "description")
 
 	return validator.Errors()
 }
