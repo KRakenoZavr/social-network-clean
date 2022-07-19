@@ -59,14 +59,10 @@ func (r *usersRepo) GetUserByEmail(email string) (models.User, error) {
 		&user.FName, &user.LName, &user.DateOfBirth,
 		&user.IsPrivate, &user.Avatar, &user.NickName, &user.About)
 
-	switch err {
-	case sql.ErrNoRows:
-		return models.User{}, NotFound
-	case nil:
-		return user, nil
-	default:
+	if err != nil {
 		return models.User{}, err
 	}
+	return user, nil
 }
 
 func (r *usersRepo) CheckUserByEmail(email string) (bool, error) {

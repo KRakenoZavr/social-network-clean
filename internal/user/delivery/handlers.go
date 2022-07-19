@@ -40,3 +40,25 @@ func (h userHandlers) Create() http.HandlerFunc {
 		w.WriteHeader(http.StatusCreated)
 	}
 }
+
+func (h userHandlers) Login() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rBody := &models.UserLogin{}
+		err := json.NewDecoder(r.Body).Decode(rBody)
+		if err != nil {
+			h.logger.Println(err.Error())
+			errHandler.ErrorResponse(w, http.StatusBadRequest, err, []string{})
+			return
+		}
+
+		cookie, sError := h.userUC.Login(rBody)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		http.SetCookie(w, cookie)
+		w.WriteHeader(http.StatusOK)
+	}
+}

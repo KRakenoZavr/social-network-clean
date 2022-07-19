@@ -8,4 +8,5 @@ import (
 
 type UseCase interface {
 	Create(*models.User) (*http.Cookie, *errHandler.ServiceError)
+	Login(*models.UserLogin) (*http.Cookie, *errHandler.ServiceError)
 }

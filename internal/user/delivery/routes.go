@@ -6,5 +6,6 @@ import (
 )
 
 func MapUserRoutes(r *router.Router, h user.Handlers) {
-	r.HandleFunc("/user/create", h.Create()).Methods("POST")
+	r.HandleFunc("/user/register", h.Create()).Methods("POST")
+	r.HandleFunc("/user/login", h.Login()).Methods("POST")
 }

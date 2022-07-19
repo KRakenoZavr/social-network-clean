@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"database/sql"
 	"errors"
 	"log"
 	"mux/internal/models"
@@ -78,10 +79,43 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 		}
 	}
 
-	// cookie
+	return u.createCookie(id), &errHandler.ServiceError{}
+}
+
+func (u *userUC) Login(user *models.UserLogin) (*http.Cookie, *errHandler.ServiceError) {
+	// check if exist
+	dbUser, err := u.userRepo.GetUserByEmail(user.Email)
+	if err != nil {
+		if errors.Is(sql.ErrNoRows, err) {
+			return nil, &errHandler.ServiceError{
+				Code:    http.StatusBadRequest,
+				Message: []string{"check your credentials"},
+				Err:     err,
+			}
+		}
+
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"user: db access error"},
+			Err:     err,
+		}
+	}
+
+	if dbUser.Password != user.Password {
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: []string{"check your credentials"},
+			Err:     errors.New("wrong credentials"),
+		}
+	}
+
+	return u.createCookie(dbUser.UserID), &errHandler.ServiceError{}
+}
+
+func (u *userUC) createCookie(userId uuid.UUID) *http.Cookie {
 	sessionToken := uuid.NewV4()
 	expires := time.Now().Add(1 * time.Hour)
-	u.userRepo.CreateUserAuth(&models.UserAuth{UserID: id, Expires: expires, Session: sessionToken})
+	u.userRepo.CreateUserAuth(&models.UserAuth{UserID: userId, Expires: expires, Session: sessionToken})
 
 	cookie := &http.Cookie{
 		Name:     "session_token",
@@ -91,5 +125,5 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 		Path:     "/",
 	}
 
-	return cookie, &errHandler.ServiceError{}
+	return cookie
 }
