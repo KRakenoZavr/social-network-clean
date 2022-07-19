@@ -1,6 +1,6 @@
 CREATE TABLE groups(
-  group_id INTEGER PRIMARY KEY  AUTOINCREMENT,
-  user_id         INTEGER       NOT NULL,
+  group_id        VARCHAR(30) PRIMARY KEY,
+  user_id         VARCHAR(30)   NOT NULL,
   created_at      DATETIME      NOT NULL,
   title           VARCHAR(50)   NOT NULL,
   body            VARCHAR(255)  NOT NULL,
