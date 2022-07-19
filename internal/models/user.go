@@ -18,3 +18,9 @@ type User struct {
 	NickName    string    `json:"nickname" db:"nickname"`
 	About       string    `json:"about" db:"about"`
 }
+
+type UserAuth struct {
+	UserID  uuid.UUID
+	Expires time.Time
+	Session uuid.UUID
+}

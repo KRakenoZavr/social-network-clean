@@ -29,13 +29,14 @@ func (h userHandlers) Create() http.HandlerFunc {
 			return
 		}
 
-		sError := h.userUC.Create(rBody)
+		cookie, sError := h.userUC.Create(rBody)
 		if sError.Err != nil {
 			h.logger.Println(sError.Error())
 			sError.ErrorResponse(w)
 			return
 		}
 
+		http.SetCookie(w, cookie)
 		w.WriteHeader(http.StatusCreated)
 	}
 }

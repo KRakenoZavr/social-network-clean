@@ -8,6 +8,9 @@ import (
 	"mux/pkg/utils"
 	"mux/pkg/utils/errHandler"
 	"net/http"
+	"time"
+
+	"github.com/satori/uuid"
 )
 
 type userUC struct {
@@ -36,24 +39,37 @@ func (u *userUC) validateUser(user *models.User) []error {
 	return validator.Errors()
 }
 
-func (u *userUC) Create(user *models.User) *errHandler.ServiceError {
+func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceError) {
 	listOfErrors := u.validateUser(user)
 	if listOfErrors != nil {
-		return &errHandler.ServiceError{
+		return nil, &errHandler.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: utils.ErrArrayToStringArray(listOfErrors),
 			Err:     errors.New("user: fields validation error"),
 		}
 	}
 
-	err := u.userRepo.Create(user)
+	id, err := u.userRepo.Create(user)
 	if err != nil {
-		return &errHandler.ServiceError{
+		return nil, &errHandler.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: []string{},
 			Err:     errors.New("user: db access error"),
 		}
 	}
 
-	return &errHandler.ServiceError{}
+	// cookie
+	sessionToken := uuid.NewV4()
+	expires := time.Now().Add(1 * time.Hour)
+	u.userRepo.CreateUserAuth(&models.UserAuth{UserID: id, Expires: expires, Session: sessionToken})
+
+	cookie := &http.Cookie{
+		Name:     "session_token",
+		Value:    sessionToken.String(),
+		Expires:  expires,
+		HttpOnly: true,
+		Path:     "/",
+	}
+
+	return cookie, &errHandler.ServiceError{}
 }

@@ -3,8 +3,10 @@ package middleware
 import (
 	"errors"
 	"log"
+	"mux/internal/user"
 	"mux/pkg/utils/errHandler"
 	"net/http"
+	"time"
 )
 
 type (
@@ -12,30 +14,50 @@ type (
 	Middlewares []Middleware
 )
 
-func checkAuth(c *http.Cookie) error {
-	c.Expires.Add(5 * 60 * 1000)
-	if false {
-		return errors.New("not authed")
+var (
+	TokenExpired = errors.New("session token expired")
+)
+
+type AuthMiddleware struct {
+	r      user.Repository
+	logger *log.Logger
+}
+
+func NewAuthMiddleware(r user.Repository, logger *log.Logger) *AuthMiddleware {
+	return &AuthMiddleware{r: r, logger: logger}
+}
+
+func (m *AuthMiddleware) checkAuth(c *http.Cookie) error {
+	userAuth, err := m.r.GetUserAuth(c.Value)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+	isBefore := userAuth.Expires.Before(now)
+
+	if isBefore {
+		return TokenExpired
 	}
 	return nil
 }
 
-func CheckAuth(hdlr http.Handler) http.Handler {
+func (m *AuthMiddleware) CheckAuth(hdlr http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("secret")
+		cookie, err := r.Cookie("session_token")
+		log.Println(cookie)
 		if err != nil {
-			log.Println("error accessing cookie", err.Error())
-			errHandler.ErrorResponse(w, http.StatusInternalServerError, errors.New("error accessing cookie"), []string{})
+			log.Println("no cookie", err.Error())
+			errHandler.ErrorResponse(w, http.StatusUnauthorized, err, []string{})
 			return
 		}
 
-		err = checkAuth(cookie)
+		err = m.checkAuth(cookie)
 		if err != nil {
-			errHandler.ErrorResponse(w, http.StatusUnauthorized, errors.New("you should authorize"), []string{})
+			errHandler.ErrorResponse(w, http.StatusUnauthorized, err, []string{})
 			return
 		}
 
-		hdlr.ServeHTTP(w, r)
-
+		hdlr(w, r)
 	})
 }

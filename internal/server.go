@@ -7,6 +7,7 @@ import (
 
 	"mux/pkg/logger"
 
+	"mux/internal/middleware"
 	userHttp "mux/internal/user/delivery"
 	userRepository "mux/internal/user/repository"
 	userUseCase "mux/internal/user/usecase"
@@ -59,7 +60,17 @@ func (s *Server) configureRouter() {
 	// init handler
 	userHandlers := userHttp.NewUserHandlers(userUC, handlersLogger)
 
+	// init middleware
+	authMW := middleware.NewAuthMiddleware(userRepo, handlersLogger)
+
 	userHttp.MapUserRoutes(s.router, userHandlers)
+	s.router.HandleFunc("/", authMW.CheckAuth(asd())).Methods("GET")
+}
+
+func asd() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+	}
 }
 
 func (s *Server) other(hdlr http.Handler) http.Handler {
