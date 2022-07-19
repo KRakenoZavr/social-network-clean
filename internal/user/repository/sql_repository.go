@@ -18,7 +18,7 @@ type usersRepo struct {
 }
 
 var (
-	UserNoAuth = errors.New("user is not authenticated")
+	NotFound = errors.New("no row found")
 )
 
 func NewUserRepository(db *sql.DB, logger *log.Logger) user.Repository {
@@ -52,6 +52,38 @@ func (r *usersRepo) Create(user *models.User) (uuid.UUID, error) {
 	return id, nil
 }
 
+func (r *usersRepo) GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+	row := r.db.QueryRow(getUserByEmailQuery, email)
+	err := row.Scan(&user.UserID, &user.Email, &user.Password,
+		&user.FName, &user.LName, &user.DateOfBirth,
+		&user.IsPrivate, &user.Avatar, &user.NickName, &user.About)
+
+	switch err {
+	case sql.ErrNoRows:
+		return models.User{}, NotFound
+	case nil:
+		return user, nil
+	default:
+		return models.User{}, err
+	}
+}
+
+func (r *usersRepo) CheckUserByEmail(email string) (bool, error) {
+	var userId string
+	row := r.db.QueryRow(getUserIDByEmailQuery, email)
+	err := row.Scan(&userId)
+
+	switch err {
+	case sql.ErrNoRows:
+		return false, nil
+	case nil:
+		return true, nil
+	default:
+		return false, err
+	}
+}
+
 func (r *usersRepo) CreateUserAuth(userAuth *models.UserAuth) error {
 	query, err := r.db.Prepare(createUserAuthQuery)
 	if err != nil {
@@ -78,11 +110,11 @@ func (r *usersRepo) CreateUserAuth(userAuth *models.UserAuth) error {
 func (r *usersRepo) GetUserAuth(session string) (models.UserAuth, error) {
 	var user models.UserAuth
 	row := r.db.QueryRow(getUserAuthQuery, session)
-	err := row.Scan(&user.UserID, &user.Expires, &user.Session)
+	err := row.Scan(&user.ID, &user.UserID, &user.Expires, &user.Session)
 
 	switch err {
 	case sql.ErrNoRows:
-		return models.UserAuth{}, UserNoAuth
+		return models.UserAuth{}, NotFound
 	case nil:
 		return user, nil
 	default:

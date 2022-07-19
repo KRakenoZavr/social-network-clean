@@ -20,6 +20,7 @@ type User struct {
 }
 
 type UserAuth struct {
+	ID      int
 	UserID  uuid.UUID
 	Expires time.Time
 	Session uuid.UUID

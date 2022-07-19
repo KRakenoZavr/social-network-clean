@@ -40,6 +40,7 @@ func (u *userUC) validateUser(user *models.User) []error {
 }
 
 func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceError) {
+	// validate user fields
 	listOfErrors := u.validateUser(user)
 	if listOfErrors != nil {
 		return nil, &errHandler.ServiceError{
@@ -49,12 +50,31 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 		}
 	}
 
+	// check if exist
+	isExist, err := u.userRepo.CheckUserByEmail(user.Email)
+	if err != nil {
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"user: db access error"},
+			Err:     err,
+		}
+	}
+
+	if isExist {
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: []string{"user: user with email already exists"},
+			Err:     errors.New("user already exists"),
+		}
+	}
+
+	// create user
 	id, err := u.userRepo.Create(user)
 	if err != nil {
 		return nil, &errHandler.ServiceError{
 			Code:    http.StatusInternalServerError,
-			Message: []string{},
-			Err:     errors.New("user: db access error"),
+			Message: []string{"user: db access error"},
+			Err:     err,
 		}
 	}
 
