@@ -23,7 +23,7 @@ func NewUserRepository(db *sql.DB, logger *log.Logger) user.Repository {
 func (r *usersRepo) Create(user *models.User) error {
 	id := uuid.NewV4()
 
-	query, err := r.db.Prepare(createUser)
+	query, err := r.db.Prepare(createUserQuery)
 	if err != nil {
 		return err
 	}
