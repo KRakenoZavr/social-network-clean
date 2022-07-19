@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 	"log"
 	"os"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattn/go-sqlite3"
@@ -15,7 +16,7 @@ import (
 
 const DbName = "social.db"
 
-func CreateDB() *sql.DB {
+func CreateDB(migration bool) *sql.DB {
 	// create social.db if not exists
 	if _, err := os.Stat(DbName); os.IsNotExist(err) {
 		_, err = os.Create(DbName)
@@ -29,6 +30,10 @@ func CreateDB() *sql.DB {
 	db, err := sql.Open("sqlite3", fmt.Sprintf("%s?_foreign_keys=on", DbName))
 	if err != nil {
 		log.Fatalf("Cannot open db, err: %s", err)
+	}
+
+	if !migration {
+		return db
 	}
 
 	// create sqilte driver
