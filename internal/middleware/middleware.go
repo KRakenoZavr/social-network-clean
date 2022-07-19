@@ -46,13 +46,14 @@ func (m *AuthMiddleware) CheckAuth(hdlr http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_token")
 		if err != nil {
-			log.Println("no cookie", err.Error())
+			m.logger.Println("no cookie", err.Error())
 			errHandler.ErrorResponse(w, http.StatusUnauthorized, err, []string{"no cookie"})
 			return
 		}
 
 		err = m.checkAuth(cookie)
 		if err != nil {
+			m.logger.Println("check cookie error", err.Error())
 			errHandler.ErrorResponse(w, http.StatusUnauthorized, err, []string{})
 			return
 		}
