@@ -12,12 +12,15 @@ import (
 	"time"
 
 	"github.com/satori/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userUC struct {
 	userRepo user.Repository
 	logger   *log.Logger
 }
+
+const cryptCost = 10
 
 func NewUserUseCase(userRepo user.Repository, logger *log.Logger) user.UseCase {
 	return &userUC{userRepo: userRepo, logger: logger}
@@ -69,6 +72,16 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 		}
 	}
 
+	cryptedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), cryptCost)
+	if err != nil {
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"cant crypt pass"},
+			Err:     err,
+		}
+	}
+	user.Password = string(cryptedPass)
+
 	// create user
 	id, err := u.userRepo.Create(user)
 	if err != nil {
@@ -89,7 +102,7 @@ func (u *userUC) Login(user *models.UserLogin) (*http.Cookie, *errHandler.Servic
 		if errors.Is(sql.ErrNoRows, err) {
 			return nil, &errHandler.ServiceError{
 				Code:    http.StatusBadRequest,
-				Message: []string{"check your credentials"},
+				Message: []string{"wrong credentials"},
 				Err:     err,
 			}
 		}
@@ -101,11 +114,12 @@ func (u *userUC) Login(user *models.UserLogin) (*http.Cookie, *errHandler.Servic
 		}
 	}
 
-	if dbUser.Password != user.Password {
+	err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password))
+	if err != nil {
 		return nil, &errHandler.ServiceError{
 			Code:    http.StatusBadRequest,
-			Message: []string{"check your credentials"},
-			Err:     errors.New("wrong credentials"),
+			Message: []string{"wrong credentials"},
+			Err:     err,
 		}
 	}
 
