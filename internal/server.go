@@ -56,21 +56,21 @@ func (s *Server) configureRouter() {
 
 	// init repo
 	userRepo := userRepository.NewRepository(s.db, handlersLogger)
-	groupRepo := groupRepository.NewGroupRepository(s.db, handlersLogger)
+	groupRepo := groupRepository.NewRepository(s.db, handlersLogger)
 
 	// init usecase
 	userUC := userUseCase.NewUseCase(userRepo, handlersLogger)
-	groupUC := groupUseCase.NewGroupUseCase(groupRepo, handlersLogger)
+	groupUC := groupUseCase.NewUseCase(groupRepo, handlersLogger)
 
 	// init handler
 	userHandlers := userHttp.NewHandler(userUC, handlersLogger)
-	groupHandlers := groupHttp.NewGroupHandlers(groupUC, handlersLogger)
+	groupHandlers := groupHttp.NewHandler(groupUC, handlersLogger)
 
 	// init middleware
 	authMW := middleware.NewAuthMiddleware(userRepo, handlersLogger)
 
 	userHttp.MapRoutes(s.router, userHandlers)
-	groupHttp.MapGroupRoutes(s.router, groupHandlers)
+	groupHttp.MapRoutes(s.router, groupHandlers)
 
 	s.router.HandleFunc("/", authMW.CheckAuth(asd())).Methods("GET")
 }

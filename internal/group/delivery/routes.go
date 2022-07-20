@@ -5,6 +5,6 @@ import (
 	"mux/pkg/server/router"
 )
 
-func MapGroupRoutes(r *router.Router, h group.Handlers) {
+func MapRoutes(r *router.Router, h group.Handlers) {
 	r.HandleFunc("/group/create", h.Create()).Methods("POST")
 }

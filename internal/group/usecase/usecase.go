@@ -15,7 +15,7 @@ type groupUC struct {
 	logger    *log.Logger
 }
 
-func NewGroupUseCase(groupRepo group.Repository, logger *log.Logger) group.UseCase {
+func NewUseCase(groupRepo group.Repository, logger *log.Logger) group.UseCase {
 	return &groupUC{groupRepo: groupRepo, logger: logger}
 }
 
