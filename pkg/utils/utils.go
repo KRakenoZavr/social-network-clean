@@ -2,7 +2,7 @@ package utils
 
 import "fmt"
 
-func Contains[T comparable](arr []T, search T) bool {
+func Contains(arr []string, search string) bool {
 	for _, el := range arr {
 		if el == search {
 			return true
