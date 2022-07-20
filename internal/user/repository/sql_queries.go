@@ -10,6 +10,8 @@ const (
 		SELECT * FROM users WHERE email=$1`
 	getUserIDByEmailQuery = `
 		SELECT user_id FROM users WHERE email=$1`
+	getUserByIDQuery = `
+		SELECT * FROM users WHERE user_id=$1`
 )
 
 const (

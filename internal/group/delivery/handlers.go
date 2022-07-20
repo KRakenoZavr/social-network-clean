@@ -3,6 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"log"
+	"mux/internal/middleware"
 	"mux/internal/models"
 	"mux/pkg/utils/errHandler"
 	"net/http"
@@ -29,7 +30,9 @@ func (h groupHandlers) Create() http.HandlerFunc {
 			return
 		}
 
-		sError := h.groupUC.Create(rBody)
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		sError := h.groupUC.Create(rBody, user)
 		if sError.Err != nil {
 			h.logger.Println(sError.Error())
 			sError.ErrorResponse(w)

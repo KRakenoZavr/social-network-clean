@@ -8,6 +8,7 @@ import (
 	"mux/pkg/utils"
 	"mux/pkg/utils/errHandler"
 	"net/http"
+	"time"
 )
 
 type groupUC struct {
@@ -27,7 +28,7 @@ func (u *groupUC) validateGroup(group *models.Group) []error {
 	return validator.Errors()
 }
 
-func (u *groupUC) Create(group *models.Group) *errHandler.ServiceError {
+func (u *groupUC) Create(group *models.Group, user models.User) *errHandler.ServiceError {
 	// validate group fields
 	listOfErrors := u.validateGroup(group)
 	if listOfErrors != nil {
@@ -55,6 +56,9 @@ func (u *groupUC) Create(group *models.Group) *errHandler.ServiceError {
 			Err:     errors.New("group already exists"),
 		}
 	}
+
+	group.UserID = user.UserID
+	group.CreatedAt = time.Now()
 
 	// create group
 	err = u.groupRepo.Create(group)

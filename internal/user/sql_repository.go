@@ -10,6 +10,7 @@ type Repository interface {
 	Create(*models.User) (uuid.UUID, error)
 	GetUserByEmail(string) (models.User, error)
 	CheckUserByEmail(string) (bool, error)
+	GetUserByID(uuid.UUID) (models.User, error)
 
 	CreateUserAuth(*models.UserAuth) error
 	GetUserAuth(string) (models.UserAuth, error)

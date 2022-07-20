@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"log"
+	"mux/internal/models"
 	"mux/internal/user"
 	"mux/pkg/utils/errHandler"
 	"net/http"
@@ -18,6 +20,9 @@ var (
 	TokenExpired = errors.New("session token expired")
 )
 
+type ContextKey string
+const ContextUserKey ContextKey = "user"
+
 type AuthMiddleware struct {
 	r      user.Repository
 	logger *log.Logger
@@ -27,23 +32,29 @@ func NewAuthMiddleware(r user.Repository, logger *log.Logger) *AuthMiddleware {
 	return &AuthMiddleware{r: r, logger: logger}
 }
 
-func (m *AuthMiddleware) checkAuth(c *http.Cookie) error {
+func (m *AuthMiddleware) checkAuth(c *http.Cookie) (models.User, error) {
 	userAuth, err := m.r.GetUserAuth(c.Value)
 	if err != nil {
-		return err
+		return models.User{}, err
 	}
 
 	now := time.Now()
 	isBefore := userAuth.Expires.Before(now)
 
 	if isBefore {
-		return TokenExpired
+		return models.User{}, TokenExpired
 	}
-	return nil
+
+	dbUser, err := m.r.GetUserByID(userAuth.UserID)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return dbUser, nil
 }
 
 func (m *AuthMiddleware) CheckAuth(hdlr http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_token")
 		if err != nil {
 			m.logger.Println("no cookie", err.Error())
@@ -51,13 +62,15 @@ func (m *AuthMiddleware) CheckAuth(hdlr http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		err = m.checkAuth(cookie)
+		dbUser, err := m.checkAuth(cookie)
 		if err != nil {
 			m.logger.Println("check cookie error", err.Error())
 			errHandler.ErrorResponse(w, http.StatusUnauthorized, err, []string{})
 			return
 		}
 
-		hdlr(w, r)
-	})
+		ctx := context.WithValue(r.Context(), ContextUserKey, dbUser)
+
+		hdlr(w, r.WithContext(ctx))
+	}
 }

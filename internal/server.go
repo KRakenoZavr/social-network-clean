@@ -28,7 +28,7 @@ type Server struct {
 func NewServer() (s *Server) {
 	s = &Server{
 		router: router.NewRouter(),
-		db:     sqlite.CreateDB(true),
+		db:     sqlite.CreateDB(false),
 	}
 
 	s.configureRouter()
@@ -62,23 +62,16 @@ func (s *Server) configureRouter() {
 	userUC := userUseCase.NewUseCase(userRepo, handlersLogger)
 	groupUC := groupUseCase.NewUseCase(groupRepo, handlersLogger)
 
+	// init middleware
+	authMW := middleware.NewAuthMiddleware(userRepo, handlersLogger)
+
 	// init handler
 	userHandlers := userHttp.NewHandler(userUC, handlersLogger)
 	groupHandlers := groupHttp.NewHandler(groupUC, handlersLogger)
 
-	// init middleware
-	authMW := middleware.NewAuthMiddleware(userRepo, handlersLogger)
 
 	userHttp.MapRoutes(s.router, userHandlers)
-	groupHttp.MapRoutes(s.router, groupHandlers)
-
-	s.router.HandleFunc("/", authMW.CheckAuth(asd())).Methods("GET")
-}
-
-func asd() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusCreated)
-	}
+	groupHttp.MapRoutes(s.router, groupHandlers, authMW)
 }
 
 func (s *Server) other(hdlr http.Handler) http.Handler {

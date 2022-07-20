@@ -53,16 +53,29 @@ func (r *usersRepo) Create(user *models.User) (uuid.UUID, error) {
 }
 
 func (r *usersRepo) GetUserByEmail(email string) (models.User, error) {
-	var user models.User
+	var dbUser models.User
 	row := r.db.QueryRow(getUserByEmailQuery, email)
-	err := row.Scan(&user.UserID, &user.Email, &user.Password,
-		&user.FName, &user.LName, &user.DateOfBirth,
-		&user.IsPrivate, &user.Avatar, &user.NickName, &user.About)
+	err := row.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.Password,
+		&dbUser.FName, &dbUser.LName, &dbUser.DateOfBirth,
+		&dbUser.IsPrivate, &dbUser.Avatar, &dbUser.NickName, &dbUser.About)
 
 	if err != nil {
 		return models.User{}, err
 	}
-	return user, nil
+	return dbUser, nil
+}
+
+func (r *usersRepo) GetUserByID(id uuid.UUID) (models.User, error) {
+	var dbUser models.User
+	row := r.db.QueryRow(getUserByIDQuery, id)
+	err := row.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.Password,
+		&dbUser.FName, &dbUser.LName, &dbUser.DateOfBirth,
+		&dbUser.IsPrivate, &dbUser.Avatar, &dbUser.NickName, &dbUser.About)
+
+	if err != nil {
+		return models.User{}, err
+	}
+	return dbUser, nil
 }
 
 func (r *usersRepo) CheckUserByEmail(email string) (bool, error) {
@@ -104,15 +117,15 @@ func (r *usersRepo) CreateUserAuth(userAuth *models.UserAuth) error {
 }
 
 func (r *usersRepo) GetUserAuth(session string) (models.UserAuth, error) {
-	var user models.UserAuth
+	var dbUser models.UserAuth
 	row := r.db.QueryRow(getUserAuthQuery, session)
-	err := row.Scan(&user.ID, &user.UserID, &user.Expires, &user.Session)
+	err := row.Scan(&dbUser.ID, &dbUser.UserID, &dbUser.Expires, &dbUser.Session)
 
 	switch err {
 	case sql.ErrNoRows:
 		return models.UserAuth{}, NotFound
 	case nil:
-		return user, nil
+		return dbUser, nil
 	default:
 		return models.UserAuth{}, err
 	}

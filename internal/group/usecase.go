@@ -6,5 +6,5 @@ import (
 )
 
 type UseCase interface {
-	Create(*models.Group) *errHandler.ServiceError
+	Create(*models.Group, models.User) *errHandler.ServiceError
 }
