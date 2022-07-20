@@ -25,7 +25,7 @@ type Server struct {
 func NewServer() (s *Server) {
 	s = &Server{
 		router: router.NewRouter(),
-		db:     sqlite.CreateDB(false),
+		db:     sqlite.CreateDB(true),
 	}
 
 	s.configureRouter()
