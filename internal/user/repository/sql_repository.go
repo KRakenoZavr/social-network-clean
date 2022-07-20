@@ -21,7 +21,7 @@ var (
 	NotFound = errors.New("no row found")
 )
 
-func NewUserRepository(db *sql.DB, logger *log.Logger) user.Repository {
+func NewRepository(db *sql.DB, logger *log.Logger) user.Repository {
 	return &usersRepo{db: db, logger: logger}
 }
 

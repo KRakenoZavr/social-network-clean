@@ -22,7 +22,7 @@ type userUC struct {
 
 const cryptCost = 10
 
-func NewUserUseCase(userRepo user.Repository, logger *log.Logger) user.UseCase {
+func NewUseCase(userRepo user.Repository, logger *log.Logger) user.UseCase {
 	return &userUC{userRepo: userRepo, logger: logger}
 }
 
@@ -92,7 +92,18 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 		}
 	}
 
-	return u.createCookie(id), &errHandler.ServiceError{}
+	cookie, err := u.createCookie(id)
+	if err != nil {
+		return nil, &errHandler.ServiceError{
+			Code: http.StatusInternalServerError,
+			Message: []string{"cannot save token"},
+			Err: err,
+		}
+	}
+
+	return cookie, &errHandler.ServiceError{
+		Err: nil,
+	}
 }
 
 func (u *userUC) Login(user *models.UserLogin) (*http.Cookie, *errHandler.ServiceError) {
@@ -123,13 +134,25 @@ func (u *userUC) Login(user *models.UserLogin) (*http.Cookie, *errHandler.Servic
 		}
 	}
 
-	return u.createCookie(dbUser.UserID), &errHandler.ServiceError{}
+	cookie, err := u.createCookie(dbUser.UserID)
+	if err != nil {
+		return nil, &errHandler.ServiceError{
+			Code: http.StatusInternalServerError,
+			Message: []string{"cannot save token"},
+			Err: err,
+		}
+	}
+
+	return cookie, &errHandler.ServiceError{Err: nil}
 }
 
-func (u *userUC) createCookie(userId uuid.UUID) *http.Cookie {
+func (u *userUC) createCookie(userId uuid.UUID) (*http.Cookie, error) {
 	sessionToken := uuid.NewV4()
 	expires := time.Now().Add(1 * time.Hour)
-	u.userRepo.CreateUserAuth(&models.UserAuth{UserID: userId, Expires: expires, Session: sessionToken})
+	err := u.userRepo.CreateUserAuth(&models.UserAuth{UserID: userId, Expires: expires, Session: sessionToken})
+	if err != nil {
+		return nil, err
+	}
 
 	cookie := &http.Cookie{
 		Name:     "session_token",
@@ -139,5 +162,5 @@ func (u *userUC) createCookie(userId uuid.UUID) *http.Cookie {
 		Path:     "/",
 	}
 
-	return cookie
+	return cookie, nil
 }

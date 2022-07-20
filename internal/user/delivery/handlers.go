@@ -15,7 +15,7 @@ type userHandlers struct {
 	logger *log.Logger
 }
 
-func NewUserHandlers(userUC user.UseCase, logger *log.Logger) user.Handlers {
+func NewHandler(userUC user.UseCase, logger *log.Logger) user.Handlers {
 	return &userHandlers{userUC: userUC, logger: logger}
 }
 

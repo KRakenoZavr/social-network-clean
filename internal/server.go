@@ -7,6 +7,9 @@ import (
 
 	"mux/pkg/logger"
 
+	groupHttp "mux/internal/group/delivery"
+	groupRepository "mux/internal/group/repository"
+	groupUseCase "mux/internal/group/usecase"
 	"mux/internal/middleware"
 	userHttp "mux/internal/user/delivery"
 	userRepository "mux/internal/user/repository"
@@ -52,18 +55,23 @@ func (s *Server) configureRouter() {
 	handlersLogger := logger.HandlersLogger()
 
 	// init repo
-	userRepo := userRepository.NewUserRepository(s.db, handlersLogger)
+	userRepo := userRepository.NewRepository(s.db, handlersLogger)
+	groupRepo := groupRepository.NewGroupRepository(s.db, handlersLogger)
 
 	// init usecase
-	userUC := userUseCase.NewUserUseCase(userRepo, handlersLogger)
+	userUC := userUseCase.NewUseCase(userRepo, handlersLogger)
+	groupUC := groupUseCase.NewGroupUseCase(groupRepo, handlersLogger)
 
 	// init handler
-	userHandlers := userHttp.NewUserHandlers(userUC, handlersLogger)
+	userHandlers := userHttp.NewHandler(userUC, handlersLogger)
+	groupHandlers := groupHttp.NewGroupHandlers(groupUC, handlersLogger)
 
 	// init middleware
 	authMW := middleware.NewAuthMiddleware(userRepo, handlersLogger)
 
-	userHttp.MapUserRoutes(s.router, userHandlers)
+	userHttp.MapRoutes(s.router, userHandlers)
+	groupHttp.MapGroupRoutes(s.router, groupHandlers)
+
 	s.router.HandleFunc("/", authMW.CheckAuth(asd())).Methods("GET")
 }
 
