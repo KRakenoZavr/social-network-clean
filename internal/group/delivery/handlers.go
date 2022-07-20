@@ -15,7 +15,7 @@ type groupHandlers struct {
 	logger  *log.Logger
 }
 
-func NewUserHandlers(groupUC group.UseCase, logger *log.Logger) group.Handlers {
+func NewGroupHandlers(groupUC group.UseCase, logger *log.Logger) group.Handlers {
 	return &groupHandlers{groupUC: groupUC, logger: logger}
 }
 

@@ -15,7 +15,7 @@ type groupRepo struct {
 	logger *log.Logger
 }
 
-func NewUserRepository(db *sql.DB, logger *log.Logger) group.Repository {
+func NewGroupRepository(db *sql.DB, logger *log.Logger) group.Repository {
 	return &groupRepo{db: db, logger: logger}
 }
 

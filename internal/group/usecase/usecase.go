@@ -15,11 +15,11 @@ type groupUC struct {
 	logger    *log.Logger
 }
 
-func NewUserUseCase(groupRepo group.Repository, logger *log.Logger) group.UseCase {
+func NewGroupUseCase(groupRepo group.Repository, logger *log.Logger) group.UseCase {
 	return &groupUC{groupRepo: groupRepo, logger: logger}
 }
 
-func (u *groupUC) validateUser(group *models.Group) []error {
+func (u *groupUC) validateGroup(group *models.Group) []error {
 	validator := utils.NewValidator()
 	validator.CheckNull(group.Title, "title")
 	validator.CheckNull(group.Body, "description")
@@ -29,7 +29,7 @@ func (u *groupUC) validateUser(group *models.Group) []error {
 
 func (u *groupUC) Create(group *models.Group) *errHandler.ServiceError {
 	// validate group fields
-	listOfErrors := u.validateUser(group)
+	listOfErrors := u.validateGroup(group)
 	if listOfErrors != nil {
 		return &errHandler.ServiceError{
 			Code:    http.StatusBadRequest,
@@ -56,7 +56,7 @@ func (u *groupUC) Create(group *models.Group) *errHandler.ServiceError {
 		}
 	}
 
-	// create user
+	// create group
 	err = u.groupRepo.Create(group)
 	if err != nil {
 		return &errHandler.ServiceError{
