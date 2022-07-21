@@ -13,4 +13,5 @@ type UseCase interface {
 	GetRequests(models.User) ([]dto.ModelJoinRequest, *errHandler.ServiceError)
 	Invite(*models.GroupUser, models.User) *errHandler.ServiceError
 	GetInvites(models.User) ([]models.Group, *errHandler.ServiceError)
+	Resolve(*dto.ModelResolve, models.User) *errHandler.ServiceError
 }

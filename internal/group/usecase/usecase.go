@@ -194,3 +194,18 @@ func (u *groupUC) GetInvites(user models.User) ([]models.Group, *errHandler.Serv
 		Err: nil,
 	}
 }
+
+func (u *groupUC) Resolve(resolve *dto.ModelResolve, user models.User) *errHandler.ServiceError {
+	err := u.groupRepo.Resolve(resolve, user)
+	if err != nil {
+		return &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"group: db access error"},
+			Err:     err,
+		}
+	}
+
+	return &errHandler.ServiceError{
+		Err: nil,
+	}
+}

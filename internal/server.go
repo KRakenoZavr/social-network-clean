@@ -28,7 +28,7 @@ type Server struct {
 func NewServer() (s *Server) {
 	s = &Server{
 		router: router.NewRouter(),
-		db:     sqlite.CreateDB(false),
+		db:     sqlite.CreateDB(true),
 	}
 
 	s.configureRouter()
@@ -68,7 +68,6 @@ func (s *Server) configureRouter() {
 	// init handler
 	userHandlers := userHttp.NewHandler(userUC, handlersLogger)
 	groupHandlers := groupHttp.NewHandler(groupUC, handlersLogger)
-
 
 	userHttp.MapRoutes(s.router, userHandlers)
 	groupHttp.MapRoutes(s.router, groupHandlers, authMW)

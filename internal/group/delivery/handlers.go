@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"mux/internal/group/dto"
 	"mux/internal/middleware"
 	"mux/internal/models"
 	"mux/pkg/utils/errHandler"
@@ -133,5 +134,28 @@ func (h *groupHandlers) GetInvites() http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(groups)
+	}
+}
+
+func (h *groupHandlers) Resolve() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rBody := &dto.ModelResolve{}
+		err := json.NewDecoder(r.Body).Decode(&rBody)
+		if err != nil {
+			h.logger.Println(err.Error())
+			errHandler.ErrorResponse(w, http.StatusBadRequest, err, []string{})
+			return
+		}
+
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		sError := h.groupUC.Resolve(rBody, user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }

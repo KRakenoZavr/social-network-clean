@@ -213,3 +213,33 @@ func (r *groupRepo) GetInvites(user models.User) ([]models.Group, error) {
 
 	return groups, nil
 }
+
+func (r *groupRepo) Resolve(resolve *dto.ModelResolve, user models.User) error {
+	var preparedQuery string
+	if resolve.Accept {
+		preparedQuery = acceptInvite
+	} else {
+		preparedQuery = declineInvite
+	}
+
+	query, err := r.db.Prepare(preparedQuery)
+	if err != nil {
+		return err
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Stmt(query).Exec(resolve.GroupID, user.UserID)
+	if err != nil {
+		r.logger.Println("doing rollback")
+		r.logger.Println(err.Error())
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+
+	return nil
+}
