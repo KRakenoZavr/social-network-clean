@@ -1,29 +1,11 @@
 const axios = require('axios')
-const port = process.env.BACKEND_PORT
-const baseUrl = `http://localhost:${port}/`
-
-const mockNormalUser = {
-  email: 'asdasd@mail.com',
-  firstName: 'vasya',
-  lastName: 'pupkin',
-  password: 'lolkek',
-  DateOfBirth: '2000-01-02T15:04:05Z',
-}
-
-const mockLoginUser = {
-  email: 'asdasd@mail.com',
-  password: 'lolkek',
-}
-
-const mockBadLoginUser = {
-  email: 'asdasd@mail.com',
-  password: 'lol',
-}
-
-const mockBadLoginUser2 = {
-  email: 'asd@mail.com',
-  password: 'lolkek',
-}
+const { baseUrl } = require('../config')
+const {
+  mockBadLoginUser,
+  mockBadLoginUser2,
+  mockLoginUser,
+  mockNormalUser,
+} = require('../__mock__/user.mock')
 
 const createUserWithoutField = (data) => {
   const res = []
@@ -58,9 +40,11 @@ describe('user calls', () => {
 
     it('already registered', async () => {
       expect.assertions(1)
-      return axios.post(`${baseUrl}user/register`, mockNormalUser).catch((err) => {
-        expect(err.response.status).toBe(400)
-      })
+      return axios
+        .post(`${baseUrl}user/register`, mockNormalUser)
+        .catch((err) => {
+          expect(err.response.status).toBe(400)
+        })
     })
   })
 
@@ -73,16 +57,20 @@ describe('user calls', () => {
 
     it('bad login', async () => {
       expect.assertions(1)
-      return axios.post(`${baseUrl}user/login`, mockBadLoginUser).catch((err) => {
-        expect(err.response.status).toBe(400)
-      })
+      return axios
+        .post(`${baseUrl}user/login`, mockBadLoginUser)
+        .catch((err) => {
+          expect(err.response.status).toBe(400)
+        })
     })
 
     it('bad password', async () => {
       expect.assertions(1)
-      return axios.post(`${baseUrl}user/login`, mockBadLoginUser2).catch((err) => {
-        expect(err.response.status).toBe(400)
-      })
+      return axios
+        .post(`${baseUrl}user/login`, mockBadLoginUser2)
+        .catch((err) => {
+          expect(err.response.status).toBe(400)
+        })
     })
   })
 })
