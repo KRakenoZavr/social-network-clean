@@ -25,10 +25,10 @@ type Server struct {
 	db     *sql.DB
 }
 
-func NewServer() (s *Server) {
+func NewServer(withMigration bool, dbName string) (s *Server) {
 	s = &Server{
 		router: router.NewRouter(),
-		db:     sqlite.CreateDB(true),
+		db:     sqlite.CreateDB(withMigration, dbName),
 	}
 
 	s.configureRouter()

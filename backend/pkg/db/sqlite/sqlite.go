@@ -14,12 +14,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const DbName = "social.db"
-
-func CreateDB(migration bool) *sql.DB {
-	// create social.db if not exists
-	if _, err := os.Stat(DbName); os.IsNotExist(err) {
-		_, err = os.Create(DbName)
+func CreateDB(migration bool, dbName string) *sql.DB {
+	// create db file if not exists
+	if _, err := os.Stat(dbName); os.IsNotExist(err) {
+		_, err = os.Create(dbName)
 		if err != nil {
 			log.Fatalf("Cannot create db file, err: %s", err)
 		}
@@ -27,7 +25,7 @@ func CreateDB(migration bool) *sql.DB {
 	}
 
 	// open database with foreign keys on
-	db, err := sql.Open("sqlite3", fmt.Sprintf("%s?_foreign_keys=on", DbName))
+	db, err := sql.Open("sqlite3", fmt.Sprintf("%s?_foreign_keys=on", dbName))
 	if err != nil {
 		log.Fatalf("Cannot open db, err: %s", err)
 	}
