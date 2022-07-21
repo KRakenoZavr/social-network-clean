@@ -9,11 +9,15 @@ PIDFILE="tmpfile-$LOGNAME.txt"
 STARTDIR=$(pwd)
 
 runTest() {
-  cd test && npm run test
+  cd test
+
+  npm run test
 }
 
 runBackend() {
-  cd backend && go run cmd/main.go
+  cd backend
+
+  go run cmd/main.go
 }
 
 start() {
@@ -32,9 +36,13 @@ start() {
   # stop and kill created processes
   # if tests failed exit with code 1
   if runTest; then
-    stop && killProcess
+    stop
+
+    killProcess
   else
-    stop && killProcess
+    stop
+
+    killProcess
     exit 1
   fi
 
