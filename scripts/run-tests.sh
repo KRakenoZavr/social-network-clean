@@ -38,6 +38,9 @@ start() {
     stop && killProcess
     exit 1
   fi
+
+  # Print a message indicating the script has been stopped
+  echo "Script has been done..."
 }
 
 stop() {
@@ -56,8 +59,6 @@ stop() {
 }
 
 killProcess() {
-  cd $STARTDIR
-
   kill -9 $(lsof -t -i:$BACKEND_PORT) && rm /backend/$DB_NAME
 }
 
