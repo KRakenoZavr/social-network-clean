@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"mux/internal/group"
+	"mux/internal/group/dto"
 	"mux/internal/models"
 
 	"github.com/satori/uuid"
@@ -93,8 +94,8 @@ func (r *groupRepo) GetAllGroups() ([]models.Group, error) {
 	return groups, nil
 }
 
-func (r *groupRepo) GetRequests(user models.User) ([]models.User, error) {
-	var users []models.User
+func (r *groupRepo) GetRequests(user models.User) ([]dto.ModelJoinRequest, error) {
+	var models []dto.ModelJoinRequest
 	rows, err := r.db.Query(getUserGroupInvites, user.UserID)
 	if err != nil {
 		return nil, err
@@ -102,12 +103,13 @@ func (r *groupRepo) GetRequests(user models.User) ([]models.User, error) {
 
 	defer rows.Close()
 	for rows.Next() {
-		var dbUser models.User
-		err = rows.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.FName, &dbUser.LName, &dbUser.Avatar)
+		var dbModel dto.ModelJoinRequest
+		err = rows.Scan(&dbModel.UserID, &dbModel.Email, &dbModel.FName,
+			&dbModel.LName, &dbModel.Avatar, &dbModel.GroupID, &dbModel.Title)
 		if err != nil {
 			return nil, err
 		}
-		users = append(users, dbUser)
+		models = append(models, dbModel)
 	}
 
 	err = rows.Err()
@@ -115,7 +117,7 @@ func (r *groupRepo) GetRequests(user models.User) ([]models.User, error) {
 		r.logger.Println(err)
 	}
 
-	return users, nil
+	return models, nil
 }
 
 func (r *groupRepo) CheckGroupByTitle(title string) (bool, error) {

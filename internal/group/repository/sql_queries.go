@@ -14,11 +14,11 @@ const (
 		SELECT * FROM groups;`
 
 	getUserGroupInvites = `
-		SELECT u.user_id,u.email,u.first_name,u.last_name,u.avatar FROM users u
+		SELECT u.user_id,u.email,u.first_name,u.last_name,u.avatar,j.group_id,j.title FROM users u
 		JOIN 
-			(SELECT gu.id,gu.group_id, gu.user_id,gu.created_at,gu.invite FROM group_user gu
+			(SELECT gu.group_id,gu.user_id,g.title FROM group_user gu
 			JOIN groups g USING(group_id)
-			WHERE g.user_id=$1 AND gu.invite=2) 
+			WHERE g.user_id=$1 AND gu.invite=2) j
 		USING(user_id);`
 
 	getGroupByTitleQuery = `

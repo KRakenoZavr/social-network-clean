@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"mux/internal/group"
+	"mux/internal/group/dto"
 	"mux/internal/models"
 	"mux/pkg/utils"
 	"mux/pkg/utils/errHandler"
@@ -129,7 +130,7 @@ func (u *groupUC) GetAllGroups() ([]models.Group, *errHandler.ServiceError) {
 	}
 }
 
-func (u *groupUC) GetRequests(user models.User) ([]models.User, *errHandler.ServiceError) {
+func (u *groupUC) GetRequests(user models.User) ([]dto.ModelJoinRequest, *errHandler.ServiceError) {
 	gUsers, err := u.groupRepo.GetRequests(user)
 	if err != nil {
 		return nil, &errHandler.ServiceError{
