@@ -40,7 +40,7 @@ start() {
   fi
 
   # Print a message indicating the script has been stopped
-  echo "Script has been done..."
+  echo -e "everything killed...\n\n\n"
 }
 
 stop() {
@@ -55,7 +55,7 @@ stop() {
   kill $PID
 
   # Print a message indicating the script has been stopped
-  echo "Script has been done..."
+  echo -e "everything stopped...\n\n\n"
 }
 
 killProcess() {
