@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 GIT_DIR=$(git rev-parse --git-dir)
 

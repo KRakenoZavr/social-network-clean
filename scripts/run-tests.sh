@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 export BACKEND_PORT=3003
 export MIGRATION=true
