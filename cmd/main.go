@@ -1,11 +1,13 @@
 package main
 
 import (
+	"os"
+
 	"mux/internal"
 )
 
 func main() {
-	port := ":3000"
+	port := os.Getenv("port")
 
 	server := internal.NewServer()
 	server.Start(port)

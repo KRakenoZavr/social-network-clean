@@ -39,12 +39,12 @@ func NewServer() (s *Server) {
 func (s *Server) Start(port string) error {
 	s.configureRouter()
 
-	fmt.Printf("app is running on http://localhost%s\n", port)
+	fmt.Printf("app is running on http://localhost:%s\n", port)
 
 	c := controller.NewController()
 
 	server := &http.Server{
-		Addr:    port,
+		Addr:    ":" + port,
 		Handler: c.Logging(s.other(s.router)),
 	}
 
