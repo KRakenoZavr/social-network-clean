@@ -159,7 +159,7 @@ func (u *groupUC) Invite(gUser *models.GroupUser, user models.User) *errHandler.
 		return &errHandler.ServiceError{
 			Code:    http.StatusForbidden,
 			Message: []string{"you are not admin of group"},
-			Err:     err,
+			Err:     errors.New("you have no access"),
 		}
 	}
 
