@@ -84,9 +84,5 @@ describe('user calls', () => {
         expect(err.response.status).toBe(400)
       })
     })
-
-    it('just fail', async () => {
-      expect(10).toBe(1)
-    })
   })
 })
