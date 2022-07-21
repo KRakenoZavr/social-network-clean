@@ -9,3 +9,5 @@ CREATE TABLE posts(
   FOREIGN KEY(user_id) REFERENCES users(user_id),
   FOREIGN KEY(group_id) REFERENCES groups(group_id)
 );
+
+CREATE UNIQUE INDEX posts_index ON posts(post_id,group_id,user_id);

@@ -7,3 +7,5 @@ CREATE TABLE group_user(
   FOREIGN KEY(group_id) REFERENCES groups(group_id),
   FOREIGN KEY(user_id)  REFERENCES users(user_id)
 );
+
+CREATE UNIQUE INDEX group_user_index ON group_user(group_id,user_id);

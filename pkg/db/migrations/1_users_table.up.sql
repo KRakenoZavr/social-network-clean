@@ -10,3 +10,5 @@ CREATE TABLE users(
   nickname      VARCHAR(50),
   about         VARCHAR(255)
 );
+
+CREATE UNIQUE INDEX email_index ON users(email);

@@ -6,3 +6,5 @@ CREATE TABLE groups(
   body            VARCHAR(255)  NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
+
+CREATE UNIQUE INDEX group_index ON groups(group_id,user_id);
