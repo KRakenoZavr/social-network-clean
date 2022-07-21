@@ -3,12 +3,13 @@ package usecase
 import (
 	"errors"
 	"log"
+	"net/http"
+	"time"
+
 	"mux/internal/group"
 	"mux/internal/models"
 	"mux/pkg/utils"
 	"mux/pkg/utils/errHandler"
-	"net/http"
-	"time"
 )
 
 type groupUC struct {
@@ -124,6 +125,21 @@ func (u *groupUC) GetAllGroups() ([]models.Group, *errHandler.ServiceError) {
 	}
 
 	return groups, &errHandler.ServiceError{
+		Err: err,
+	}
+}
+
+func (u *groupUC) GetRequests(user models.User) ([]models.User, *errHandler.ServiceError) {
+	gUsers, err := u.groupRepo.GetRequests(user)
+	if err != nil {
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"group: db access error"},
+			Err:     err,
+		}
+	}
+
+	return gUsers, &errHandler.ServiceError{
 		Err: err,
 	}
 }

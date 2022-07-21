@@ -3,10 +3,11 @@ package delivery
 import (
 	"encoding/json"
 	"log"
+	"net/http"
+
 	"mux/internal/middleware"
 	"mux/internal/models"
 	"mux/pkg/utils/errHandler"
-	"net/http"
 
 	"mux/internal/group"
 )
@@ -75,7 +76,23 @@ func (h *groupHandlers) Get() http.HandlerFunc {
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(groups)
+	}
+}
+
+func (h *groupHandlers) GetRequests() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		gUsers, sError := h.groupUC.GetRequests(user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(gUsers)
 	}
 }

@@ -93,6 +93,31 @@ func (r *groupRepo) GetAllGroups() ([]models.Group, error) {
 	return groups, nil
 }
 
+func (r *groupRepo) GetRequests(user models.User) ([]models.User, error) {
+	var users []models.User
+	rows, err := r.db.Query(getUserGroupInvites, user.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var dbUser models.User
+		err = rows.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.FName, &dbUser.LName, &dbUser.Avatar)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, dbUser)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		r.logger.Println(err)
+	}
+
+	return users, nil
+}
+
 func (r *groupRepo) CheckGroupByTitle(title string) (bool, error) {
 	var groupId string
 	row := r.db.QueryRow(getGroupByTitleQuery, title)

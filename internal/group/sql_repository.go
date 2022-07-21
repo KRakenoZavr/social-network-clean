@@ -1,8 +1,9 @@
 package group
 
 import (
-	"github.com/satori/uuid"
 	"mux/internal/models"
+
+	"github.com/satori/uuid"
 )
 
 type Repository interface {
@@ -10,6 +11,7 @@ type Repository interface {
 	JoinRequest(*models.GroupUser) error
 
 	GetAllGroups() ([]models.Group, error)
+	GetRequests(models.User) ([]models.User, error)
 
 	CheckGroupByTitle(string) (bool, error)
 	CheckGroupByID(uuid.UUID) (bool, error)
