@@ -126,7 +126,7 @@ func (u *groupUC) GetAllGroups() ([]models.Group, *errHandler.ServiceError) {
 	}
 
 	return groups, &errHandler.ServiceError{
-		Err: err,
+		Err: nil,
 	}
 }
 
@@ -141,6 +141,41 @@ func (u *groupUC) GetRequests(user models.User) ([]dto.ModelJoinRequest, *errHan
 	}
 
 	return gUsers, &errHandler.ServiceError{
-		Err: err,
+		Err: nil,
+	}
+}
+
+func (u *groupUC) Invite(gUser *models.GroupUser, user models.User) *errHandler.ServiceError {
+	isAdmin, err := u.groupRepo.CheckAdmin(gUser.GroupID, user.UserID)
+	if err != nil {
+		return &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"group: db access error"},
+			Err:     err,
+		}
+	}
+
+	if !isAdmin {
+		return &errHandler.ServiceError{
+			Code:    http.StatusForbidden,
+			Message: []string{"you are not admin of group"},
+			Err:     err,
+		}
+	}
+
+	gUser.CreatedAt = time.Now()
+	gUser.Invite = models.InviteUser
+
+	err = u.groupRepo.Invite(gUser, user)
+	if err != nil {
+		return &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"group: db access error"},
+			Err:     err,
+		}
+	}
+
+	return &errHandler.ServiceError{
+		Err: nil,
 	}
 }

@@ -7,4 +7,5 @@ type Handlers interface {
 	JoinRequest() http.HandlerFunc
 	Get() http.HandlerFunc
 	GetRequests() http.HandlerFunc
+	Invite() http.HandlerFunc
 }

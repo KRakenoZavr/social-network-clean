@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"net/http"
+	"time"
+
 	"mux/internal/models"
 	"mux/internal/user"
 	"mux/pkg/utils"
 	"mux/pkg/utils/errHandler"
-	"net/http"
-	"time"
 
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -95,9 +96,9 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 	cookie, err := u.createCookie(id)
 	if err != nil {
 		return nil, &errHandler.ServiceError{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: []string{"cannot save token"},
-			Err: err,
+			Err:     err,
 		}
 	}
 
@@ -137,9 +138,9 @@ func (u *userUC) Login(user *models.UserLogin) (*http.Cookie, *errHandler.Servic
 	cookie, err := u.createCookie(dbUser.UserID)
 	if err != nil {
 		return nil, &errHandler.ServiceError{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: []string{"cannot save token"},
-			Err: err,
+			Err:     err,
 		}
 	}
 

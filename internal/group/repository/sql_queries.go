@@ -9,6 +9,10 @@ const (
 		INSERT INTO group_user 
 			(group_id,user_id,created_at,invite) 
 		VALUES ($1,$2,$3,$4);`
+	createGroupInviteQuery = `
+		INSERT INTO group_user
+			(group_id,user_id,created_at,invite)
+		VALUES ($1,$2,$3,$4);`
 
 	getGroupsQuery = `
 		SELECT * FROM groups;`
@@ -25,4 +29,6 @@ const (
 		SELECT group_id FROM groups WHERE title=$1;`
 	getGroupByIDQuery = `
 		SELECT group_id FROM groups WHERE group_id=$1;`
+	checkIfAdmin = `
+		SELECT group_id FROM groups WHERE group_id=$1 AND user_id=$2`
 )

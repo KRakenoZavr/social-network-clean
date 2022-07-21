@@ -96,3 +96,26 @@ func (h *groupHandlers) GetRequests() http.HandlerFunc {
 		json.NewEncoder(w).Encode(gUsers)
 	}
 }
+
+func (h *groupHandlers) Invite() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rBody := &models.GroupUser{}
+		err := json.NewDecoder(r.Body).Decode(&rBody)
+		if err != nil {
+			h.logger.Println(err.Error())
+			errHandler.ErrorResponse(w, http.StatusBadRequest, err, []string{})
+			return
+		}
+
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		sError := h.groupUC.Invite(rBody, user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+	}
+}

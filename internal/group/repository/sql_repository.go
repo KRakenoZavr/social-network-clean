@@ -149,3 +149,41 @@ func (r *groupRepo) CheckGroupByID(id uuid.UUID) (bool, error) {
 		return false, err
 	}
 }
+
+func (r *groupRepo) CheckAdmin(groupID uuid.UUID, userID uuid.UUID) (bool, error) {
+	var groupId string
+	row := r.db.QueryRow(checkIfAdmin, groupID, userID)
+	err := row.Scan(&groupId)
+
+	switch err {
+	case sql.ErrNoRows:
+		return false, nil
+	case nil:
+		return true, nil
+	default:
+		return false, err
+	}
+}
+
+func (r *groupRepo) Invite(gUser *models.GroupUser, user models.User) error {
+	query, err := r.db.Prepare(createGroupInviteQuery)
+	if err != nil {
+		return err
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Stmt(query).Exec(gUser.GroupID, gUser.UserID, gUser.CreatedAt, gUser.Invite)
+	if err != nil {
+		r.logger.Println("doing rollback")
+		r.logger.Println(err.Error())
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+
+	return nil
+}
