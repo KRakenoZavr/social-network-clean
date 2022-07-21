@@ -17,4 +17,6 @@ func MapRoutes(r *router.Router, h group.Handlers, mw *middleware.AuthMiddleware
 	r.HandleFunc("/groups", mw.CheckAuth(h.Get())).Methods("GET")
 	// list of requests for admin
 	r.HandleFunc("/group/check-join", mw.CheckAuth(h.GetRequests())).Methods("GET")
+	// list of invites from groups
+	r.HandleFunc("/group/check-invite", mw.CheckAuth(h.GetInvites())).Methods("GET")
 }

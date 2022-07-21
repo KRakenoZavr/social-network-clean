@@ -8,4 +8,5 @@ type Handlers interface {
 	Get() http.HandlerFunc
 	GetRequests() http.HandlerFunc
 	Invite() http.HandlerFunc
+	GetInvites() http.HandlerFunc
 }

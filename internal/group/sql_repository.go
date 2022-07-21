@@ -11,6 +11,7 @@ type Repository interface {
 	Create(*models.Group) error
 	JoinRequest(*models.GroupUser) error
 	Invite(*models.GroupUser, models.User) error
+	GetInvites(models.User) ([]models.Group, error)
 
 	GetAllGroups() ([]models.Group, error)
 	GetRequests(models.User) ([]dto.ModelJoinRequest, error)

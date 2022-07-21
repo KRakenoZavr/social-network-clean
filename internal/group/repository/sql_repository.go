@@ -187,3 +187,29 @@ func (r *groupRepo) Invite(gUser *models.GroupUser, user models.User) error {
 
 	return nil
 }
+
+func (r *groupRepo) GetInvites(user models.User) ([]models.Group, error) {
+	var groups []models.Group
+	rows, err := r.db.Query(getUserInvites, user.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var dbModel models.Group
+		err = rows.Scan(&dbModel.GroupID, &dbModel.UserID,
+			&dbModel.CreatedAt, &dbModel.Title, &dbModel.Body)
+		if err != nil {
+			return nil, err
+		}
+		groups = append(groups, dbModel)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		r.logger.Println(err)
+	}
+
+	return groups, nil
+}

@@ -17,6 +17,11 @@ const (
 	getGroupsQuery = `
 		SELECT * FROM groups;`
 
+	getUserInvites = `
+		SELECT gu.group_id,gu.user_id,g.created_at,g.title,g.body FROM group_user gu
+		JOIN groups g USING(group_id)
+		WHERE gu.user_id=$1 AND gu.invite=1`
+
 	getUserGroupInvites = `
 		SELECT u.user_id,u.email,u.first_name,u.last_name,u.avatar,j.group_id,j.title FROM users u
 		JOIN 

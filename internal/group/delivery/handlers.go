@@ -119,3 +119,19 @@ func (h *groupHandlers) Invite() http.HandlerFunc {
 		w.WriteHeader(http.StatusCreated)
 	}
 }
+
+func (h *groupHandlers) GetInvites() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		groups, sError := h.groupUC.GetInvites(user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(groups)
+	}
+}
