@@ -55,7 +55,7 @@ stop() {
   kill $PID
 
   # Print a message indicating the script has been stopped
-  echo -e "everything stopped...\n\n\n"
+  echo -e "everything stopped..."
 }
 
 killProcess() {
