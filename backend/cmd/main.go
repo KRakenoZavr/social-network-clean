@@ -1,9 +1,8 @@
 package main
 
 import (
-	"os"
-
 	"mux/internal"
+	"os"
 )
 
 func main() {
