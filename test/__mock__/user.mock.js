@@ -1,5 +1,13 @@
-const mockNormalUser = {
+const mockNormalUser1 = {
   email: 'asdasd@mail.com',
+  firstName: 'vasya',
+  lastName: 'pupkin',
+  password: 'lolkek',
+  DateOfBirth: '2000-01-02T15:04:05Z',
+}
+
+const mockNormalUser2 = {
+  email: 'asdasdasd@mail.com',
   firstName: 'vasya',
   lastName: 'pupkin',
   password: 'lolkek',
@@ -25,5 +33,6 @@ module.exports = {
   mockBadLoginUser,
   mockBadLoginUser2,
   mockLoginUser,
-  mockNormalUser,
+  mockNormalUser1,
+  mockNormalUser2,
 }
