@@ -31,21 +31,30 @@ describe('user calls', () => {
       expect(res1.status).toBe(201)
       expect(res2.status).toBe(201)
 
-      const cookie = res2.headers['set-cookie'][0].split(';')[0]
+      const cookie1 = res1.headers['set-cookie'][0].split(';')[0]
+      const cookie2 = res2.headers['set-cookie'][0].split(';')[0]
+      const userId1 = res1.data.userID
       const userId2 = res2.data.userID
 
       const res = await instance.post(
         `user/follow`,
         {
-          userId2: userId2,
+          userId2: userId1,
         },
         {
-          headers: { Cookie: cookie },
+          headers: { Cookie: cookie2 },
           credentials: 'include',
         }
       )
 
       expect(res.status).toBe(201)
+
+      const follows = await instance.get('user/check-follow', {
+        headers: { Cookie: cookie1 },
+        credentials: 'include',
+      })
+
+      console.log(follows.data)
     })
 
     it('try register without one field', async () => {
