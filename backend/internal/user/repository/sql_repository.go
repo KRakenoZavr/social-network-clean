@@ -17,25 +17,23 @@ type usersRepo struct {
 	logger *log.Logger
 }
 
-var (
-	NotFound = errors.New("no row found")
-)
+var NotFound = errors.New("no row found")
 
 func NewRepository(db *sql.DB, logger *log.Logger) user.Repository {
 	return &usersRepo{db: db, logger: logger}
 }
 
-func (r *usersRepo) Create(user *models.User) (uuid.UUID, error) {
+func (r *usersRepo) Create(user *models.User) (models.User, error) {
 	id := uuid.NewV4()
 
 	query, err := r.db.Prepare(createUserQuery)
 	if err != nil {
-		return uuid.Nil, err
+		return models.User{}, err
 	}
 
 	tx, err := r.db.Begin()
 	if err != nil {
-		return uuid.Nil, err
+		return models.User{}, err
 	}
 
 	_, err = tx.Stmt(query).Exec(id, user.Email, user.Password,
@@ -49,7 +47,12 @@ func (r *usersRepo) Create(user *models.User) (uuid.UUID, error) {
 		tx.Commit()
 	}
 
-	return id, nil
+	dbUser, err := r.GetUserByID(id)
+	if err != nil {
+		return dbUser, err
+	}
+
+	return dbUser, nil
 }
 
 func (r *usersRepo) GetUserByEmail(email string) (models.User, error) {
@@ -58,7 +61,6 @@ func (r *usersRepo) GetUserByEmail(email string) (models.User, error) {
 	err := row.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.Password,
 		&dbUser.FName, &dbUser.LName, &dbUser.DateOfBirth,
 		&dbUser.IsPrivate, &dbUser.Avatar, &dbUser.NickName, &dbUser.About)
-
 	if err != nil {
 		return models.User{}, err
 	}
@@ -71,7 +73,6 @@ func (r *usersRepo) GetUserByID(id uuid.UUID) (models.User, error) {
 	err := row.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.Password,
 		&dbUser.FName, &dbUser.LName, &dbUser.DateOfBirth,
 		&dbUser.IsPrivate, &dbUser.Avatar, &dbUser.NickName, &dbUser.About)
-
 	if err != nil {
 		return models.User{}, err
 	}
@@ -129,4 +130,27 @@ func (r *usersRepo) GetUserAuth(session string) (models.UserAuth, error) {
 	default:
 		return models.UserAuth{}, err
 	}
+}
+
+func (r *usersRepo) Follow(userFollow *models.UserFollow, dbUser models.User) error {
+	query, err := r.db.Prepare(createUserAuthQuery)
+	if err != nil {
+		return err
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Stmt(query).Exec(userFollow.UserID1, userFollow.UserID2, userFollow.CreatedAt, dbUser.IsPrivate)
+	if err != nil {
+		r.logger.Println("doing rollback")
+		r.logger.Println(err.Error())
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+
+	return nil
 }

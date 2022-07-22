@@ -69,7 +69,7 @@ func (s *Server) configureRouter() {
 	userHandlers := userHttp.NewHandler(userUC, handlersLogger)
 	groupHandlers := groupHttp.NewHandler(groupUC, handlersLogger)
 
-	userHttp.MapRoutes(s.router, userHandlers)
+	userHttp.MapRoutes(s.router, userHandlers, authMW)
 	groupHttp.MapRoutes(s.router, groupHandlers, authMW)
 }
 

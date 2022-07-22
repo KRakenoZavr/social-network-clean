@@ -44,11 +44,11 @@ func (u *userUC) validateUser(user *models.User) []error {
 	return validator.Errors()
 }
 
-func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceError) {
+func (u *userUC) Create(user *models.User) (models.User, *http.Cookie, *errHandler.ServiceError) {
 	// validate user fields
 	listOfErrors := u.validateUser(user)
 	if listOfErrors != nil {
-		return nil, &errHandler.ServiceError{
+		return models.User{}, nil, &errHandler.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: utils.ErrArrayToStringArray(listOfErrors),
 			Err:     errors.New("user: fields validation error"),
@@ -58,7 +58,7 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 	// check if exist
 	isExist, err := u.userRepo.CheckUserByEmail(user.Email)
 	if err != nil {
-		return nil, &errHandler.ServiceError{
+		return models.User{}, nil, &errHandler.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: []string{"user: db access error"},
 			Err:     err,
@@ -66,7 +66,7 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 	}
 
 	if isExist {
-		return nil, &errHandler.ServiceError{
+		return models.User{}, nil, &errHandler.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: []string{"user: user with email already exists"},
 			Err:     errors.New("user already exists"),
@@ -75,7 +75,7 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 
 	cryptedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), cryptCost)
 	if err != nil {
-		return nil, &errHandler.ServiceError{
+		return models.User{}, nil, &errHandler.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: []string{"cant crypt pass"},
 			Err:     err,
@@ -84,25 +84,25 @@ func (u *userUC) Create(user *models.User) (*http.Cookie, *errHandler.ServiceErr
 	user.Password = string(cryptedPass)
 
 	// create user
-	id, err := u.userRepo.Create(user)
+	dbUser, err := u.userRepo.Create(user)
 	if err != nil {
-		return nil, &errHandler.ServiceError{
+		return models.User{}, nil, &errHandler.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: []string{"user: db access error"},
 			Err:     err,
 		}
 	}
 
-	cookie, err := u.createCookie(id)
+	cookie, err := u.createCookie(dbUser.UserID)
 	if err != nil {
-		return nil, &errHandler.ServiceError{
+		return models.User{}, nil, &errHandler.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: []string{"cannot save token"},
 			Err:     err,
 		}
 	}
 
-	return cookie, &errHandler.ServiceError{
+	return dbUser, cookie, &errHandler.ServiceError{
 		Err: nil,
 	}
 }
@@ -164,4 +164,41 @@ func (u *userUC) createCookie(userId uuid.UUID) (*http.Cookie, error) {
 	}
 
 	return cookie, nil
+}
+
+func (u *userUC) Follow(userFollow *models.UserFollow, user models.User) *errHandler.ServiceError {
+	// check if exist
+	dbUser, err := u.userRepo.GetUserByID(userFollow.UserID2)
+	if err != nil {
+		if errors.Is(sql.ErrNoRows, err) {
+			return &errHandler.ServiceError{
+				Code:    http.StatusBadRequest,
+				Message: []string{"user: no user with such id"},
+				Err:     errors.New("user not exists"),
+			}
+		}
+
+		return &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"user: db access error"},
+			Err:     err,
+		}
+	}
+
+	userFollow.UserID1 = user.UserID
+	userFollow.CreatedAt = time.Now()
+
+	// create follow
+	err = u.userRepo.Follow(userFollow, dbUser)
+	if err != nil {
+		return &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"user: db access error"},
+			Err:     err,
+		}
+	}
+
+	return &errHandler.ServiceError{
+		Err: nil,
+	}
 }

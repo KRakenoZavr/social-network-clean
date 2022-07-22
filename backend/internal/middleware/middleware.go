@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"log"
+	"net/http"
+	"time"
+
 	"mux/internal/models"
 	"mux/internal/user"
 	"mux/pkg/utils/errHandler"
-	"net/http"
-	"time"
 )
 
 type (
@@ -16,11 +17,10 @@ type (
 	Middlewares []Middleware
 )
 
-var (
-	TokenExpired = errors.New("session token expired")
-)
+var TokenExpired = errors.New("session token expired")
 
 type ContextKey string
+
 const ContextUserKey ContextKey = "user"
 
 type AuthMiddleware struct {

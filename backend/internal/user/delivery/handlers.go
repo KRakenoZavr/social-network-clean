@@ -3,9 +3,11 @@ package delivery
 import (
 	"encoding/json"
 	"log"
+	"net/http"
+
+	"mux/internal/middleware"
 	"mux/internal/models"
 	"mux/pkg/utils/errHandler"
-	"net/http"
 
 	"mux/internal/user"
 )
@@ -29,7 +31,7 @@ func (h userHandlers) Create() http.HandlerFunc {
 			return
 		}
 
-		cookie, sError := h.userUC.Create(rBody)
+		dbUser, cookie, sError := h.userUC.Create(rBody)
 		if sError.Err != nil {
 			h.logger.Println(sError.Error())
 			sError.ErrorResponse(w)
@@ -38,6 +40,7 @@ func (h userHandlers) Create() http.HandlerFunc {
 
 		http.SetCookie(w, cookie)
 		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(dbUser)
 	}
 }
 
@@ -60,5 +63,28 @@ func (h userHandlers) Login() http.HandlerFunc {
 
 		http.SetCookie(w, cookie)
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (h userHandlers) Follow() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rBody := &models.UserFollow{}
+		err := json.NewDecoder(r.Body).Decode(&rBody)
+		if err != nil {
+			h.logger.Println(err.Error())
+			errHandler.ErrorResponse(w, http.StatusBadRequest, err, []string{})
+			return
+		}
+
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		sError := h.userUC.Follow(rBody, user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
 	}
 }

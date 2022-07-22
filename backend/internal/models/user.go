@@ -30,3 +30,11 @@ type UserLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type UserFollow struct {
+	ID        int        `json:"id"`
+	UserID1   uuid.UUID  `json:"userID1"`
+	UserID2   uuid.UUID  `json:"userID2"`
+	CreatedAt time.Time  `json:"createdAt"`
+	Invite    InviteType `json:"invite"`
+}

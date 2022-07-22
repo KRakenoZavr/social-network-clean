@@ -12,6 +12,10 @@ const (
 		SELECT user_id FROM users WHERE email=$1;`
 	getUserByIDQuery = `
 		SELECT * FROM users WHERE user_id=$1;`
+	createFollowQuery = `
+		INSERT INTO user_follow
+			(user_id1,user_id2,created_at,invite)
+		VALUES ($1,$2,$3,$4)`
 )
 
 const (
