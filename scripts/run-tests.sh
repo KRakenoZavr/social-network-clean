@@ -15,9 +15,7 @@ runTest() {
 }
 
 runBackend() {
-  cd backend
-
-  go run cmd/main.go
+  cd backend && go run cmd/main.go
 }
 
 start() {
@@ -32,6 +30,8 @@ start() {
 
   # Print a message indicating the script has been started
   echo "Script has been started..."
+
+  sleep 1
 
   # stop and kill created processes
   # if tests failed exit with code 1
