@@ -9,6 +9,7 @@ import (
 
 	"mux/internal/models"
 	"mux/internal/user"
+	"mux/internal/user/dto"
 	"mux/pkg/utils"
 	"mux/pkg/utils/errHandler"
 
@@ -190,6 +191,36 @@ func (u *userUC) Follow(userFollow *models.UserFollow, user models.User) *errHan
 
 	// create follow
 	err = u.userRepo.Follow(userFollow, dbUser)
+	if err != nil {
+		return &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"user: db access error"},
+			Err:     err,
+		}
+	}
+
+	return &errHandler.ServiceError{
+		Err: nil,
+	}
+}
+
+func (u *userUC) GetFollow(user models.User) ([]dto.Follow, *errHandler.ServiceError) {
+	follows, err := u.userRepo.GetFollow(user)
+	if err != nil {
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"user: db access error"},
+			Err:     err,
+		}
+	}
+
+	return follows, &errHandler.ServiceError{
+		Err: nil,
+	}
+}
+
+func (u *userUC) Resolve(resolve *dto.ModelResolve, user models.User) *errHandler.ServiceError {
+	err := u.userRepo.Resolve(resolve, user)
 	if err != nil {
 		return &errHandler.ServiceError{
 			Code:    http.StatusInternalServerError,

@@ -2,6 +2,7 @@ package user
 
 import (
 	"mux/internal/models"
+	"mux/internal/user/dto"
 
 	"github.com/satori/uuid"
 )
@@ -13,6 +14,8 @@ type Repository interface {
 	GetUserByID(uuid.UUID) (models.User, error)
 
 	Follow(*models.UserFollow, models.User) error
+	GetFollow(models.User) ([]dto.Follow, error)
+	Resolve(*dto.ModelResolve, models.User) error
 
 	CreateUserAuth(*models.UserAuth) error
 	GetUserAuth(string) (models.UserAuth, error)

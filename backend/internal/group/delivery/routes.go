@@ -20,5 +20,5 @@ func MapRoutes(r *router.Router, h group.Handlers, mw *middleware.AuthMiddleware
 	// list of invites from groups
 	r.HandleFunc("/group/check-invite", mw.CheckAuth(h.GetInvites())).Methods("GET")
 	// accept or decline invite
-	r.HandleFunc("/group/resolve", mw.CheckAuth(h.Resolve())).Methods("GET")
+	r.HandleFunc("/group/resolve", mw.CheckAuth(h.Resolve())).Methods("POST")
 }

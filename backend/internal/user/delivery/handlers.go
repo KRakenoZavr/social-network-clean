@@ -7,6 +7,7 @@ import (
 
 	"mux/internal/middleware"
 	"mux/internal/models"
+	"mux/internal/user/dto"
 	"mux/pkg/utils/errHandler"
 
 	"mux/internal/user"
@@ -86,5 +87,44 @@ func (h userHandlers) Follow() http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
+	}
+}
+
+func (h userHandlers) GetFollows() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		follows, sError := h.userUC.GetFollow(user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(follows)
+	}
+}
+
+func (h *userHandlers) Resolve() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rBody := &dto.ModelResolve{}
+		err := json.NewDecoder(r.Body).Decode(&rBody)
+		if err != nil {
+			h.logger.Println(err.Error())
+			errHandler.ErrorResponse(w, http.StatusBadRequest, err, []string{})
+			return
+		}
+
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		sError := h.userUC.Resolve(rBody, user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }

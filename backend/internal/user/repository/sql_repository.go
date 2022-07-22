@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"mux/internal/models"
+	"mux/internal/user/dto"
 
 	"github.com/satori/uuid"
 
@@ -133,7 +134,7 @@ func (r *usersRepo) GetUserAuth(session string) (models.UserAuth, error) {
 }
 
 func (r *usersRepo) Follow(userFollow *models.UserFollow, dbUser models.User) error {
-	query, err := r.db.Prepare(createUserAuthQuery)
+	query, err := r.db.Prepare(createFollowQuery)
 	if err != nil {
 		return err
 	}
@@ -144,6 +145,63 @@ func (r *usersRepo) Follow(userFollow *models.UserFollow, dbUser models.User) er
 	}
 
 	_, err = tx.Stmt(query).Exec(userFollow.UserID1, userFollow.UserID2, userFollow.CreatedAt, dbUser.IsPrivate)
+	if err != nil {
+		r.logger.Println("doing rollback")
+		r.logger.Println(err.Error())
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+
+	return nil
+}
+
+func (r *usersRepo) GetFollow(user models.User) ([]dto.Follow, error) {
+	var follows []dto.Follow
+	rows, err := r.db.Query(getInvites, user.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var dbUser dto.Follow
+		err = rows.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.FName,
+			&dbUser.LName, &dbUser.DateOfBirth,
+			&dbUser.IsPrivate, &dbUser.Avatar)
+		if err != nil {
+			return nil, err
+		}
+		follows = append(follows, dbUser)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		r.logger.Println(err)
+	}
+
+	return follows, nil
+}
+
+func (r *usersRepo) Resolve(resolve *dto.ModelResolve, user models.User) error {
+	var preparedQuery string
+	if resolve.Accept {
+		preparedQuery = acceptInvite
+	} else {
+		preparedQuery = declineInvite
+	}
+
+	query, err := r.db.Prepare(preparedQuery)
+	if err != nil {
+		return err
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Stmt(query).Exec(user.UserID, resolve.UserID)
 	if err != nil {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
