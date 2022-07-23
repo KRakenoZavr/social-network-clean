@@ -1,5 +1,6 @@
 package repository
 
+// user queries
 const (
 	createUserQuery = `
 		INSERT INTO users 
@@ -12,11 +13,14 @@ const (
 		SELECT user_id FROM users WHERE email=$1;`
 	getUserByIDQuery = `
 		SELECT * FROM users WHERE user_id=$1;`
+)
+
+// user follow queries
+const (
 	createFollowQuery = `
 		INSERT INTO user_follow
 			(user_id1,user_id2,created_at,invite)
-		VALUES ($1,$2,$3,$4)`
-
+		VALUES ($1,$2,$3,$4);`
 	getInvites = `
 		SELECT u.user_id,u.email,u.first_name,u.last_name,u.date_of_birth,u.is_private,u.avatar FROM user_follow uf
 		JOIN users u ON uf.user_id1=u.user_id
@@ -34,6 +38,7 @@ const (
 		WHERE user_id1=$2 AND user_id2=$1;`
 )
 
+// user auth queries
 const (
 	createUserAuthQuery = `
 		INSERT INTO user_auth
