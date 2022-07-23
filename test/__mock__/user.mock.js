@@ -1,5 +1,5 @@
 const mockNormalUser1 = {
-  email: 'asdasd@mail.com',
+  email: 'fUser@mail.com',
   firstName: 'vasya',
   lastName: 'pupkin',
   password: 'lolkek',
@@ -7,15 +7,24 @@ const mockNormalUser1 = {
 }
 
 const mockNormalUser2 = {
-  email: 'asdasdasd@mail.com',
+  email: 'sUser@mail.com',
   firstName: 'vasya',
   lastName: 'pupkin',
-  password: 'lolkek',
+  password: 'lolkek2',
   DateOfBirth: '2000-01-02T15:04:05Z',
 }
 
+const mockNormalUserPrivate = {
+  email: 'pUser@mail.com',
+  firstName: 'vasya',
+  lastName: 'pupkin',
+  password: 'lolkek3',
+  DateOfBirth: '2000-01-02T15:04:05Z',
+  isPrivate: true,
+}
+
 const mockLoginUser = {
-  email: 'asdasd@mail.com',
+  email: 'fUser@mail.com',
   password: 'lolkek',
 }
 
@@ -25,8 +34,8 @@ const mockBadLoginUser = {
 }
 
 const mockBadLoginUser2 = {
-  email: 'asd@mail.com',
-  password: 'lolkek',
+  email: 'fUser@mail.com',
+  password: 'lolke',
 }
 
 module.exports = {
@@ -35,4 +44,5 @@ module.exports = {
   mockLoginUser,
   mockNormalUser1,
   mockNormalUser2,
+  mockNormalUserPrivate,
 }
