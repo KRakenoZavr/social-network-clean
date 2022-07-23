@@ -17,4 +17,6 @@ func MapRoutes(r *router.Router, h user.Handlers, mw *middleware.AuthMiddleware)
 	r.HandleFunc("/user/check-follow", mw.CheckAuth(h.GetFollows())).Methods("GET")
 	// accept or decline follow
 	r.HandleFunc("/user/resolve", mw.CheckAuth(h.Resolve())).Methods("POST")
+	// user friend list
+	r.HandleFunc("/user/friends", mw.CheckAuth(h.GetFriends())).Methods("GET")
 }

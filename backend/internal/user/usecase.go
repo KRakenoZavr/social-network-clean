@@ -14,4 +14,5 @@ type UseCase interface {
 	Follow(*models.UserFollow, models.User) *errHandler.ServiceError
 	GetFollow(models.User) ([]dto.Follow, *errHandler.ServiceError)
 	Resolve(*dto.ModelResolve, models.User) *errHandler.ServiceError
+	GetFriends(models.User) ([]dto.Follow, *errHandler.ServiceError)
 }

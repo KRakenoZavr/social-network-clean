@@ -8,4 +8,5 @@ type Handlers interface {
 	Follow() http.HandlerFunc
 	GetFollows() http.HandlerFunc
 	Resolve() http.HandlerFunc
+	GetFriends() http.HandlerFunc
 }

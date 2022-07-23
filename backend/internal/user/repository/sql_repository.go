@@ -201,7 +201,7 @@ func (r *usersRepo) Resolve(resolve *dto.ModelResolve, user models.User) error {
 		return err
 	}
 
-	_, err = tx.Stmt(query).Exec(user.UserID, resolve.UserID)
+	_, err = tx.Stmt(query).Exec(resolve.UserID, user.UserID)
 	if err != nil {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
@@ -211,4 +211,31 @@ func (r *usersRepo) Resolve(resolve *dto.ModelResolve, user models.User) error {
 	}
 
 	return nil
+}
+
+func (r *usersRepo) GetFriends(user models.User) ([]dto.Follow, error) {
+	var friends []dto.Follow
+	rows, err := r.db.Query(getFriends, user.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var dbUser dto.Follow
+		err = rows.Scan(&dbUser.UserID, &dbUser.Email, &dbUser.FName,
+			&dbUser.LName, &dbUser.DateOfBirth,
+			&dbUser.IsPrivate, &dbUser.Avatar)
+		if err != nil {
+			return nil, err
+		}
+		friends = append(friends, dbUser)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		r.logger.Println(err)
+	}
+
+	return friends, nil
 }

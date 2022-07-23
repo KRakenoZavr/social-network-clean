@@ -168,6 +168,14 @@ func (u *userUC) createCookie(userId uuid.UUID) (*http.Cookie, error) {
 }
 
 func (u *userUC) Follow(userFollow *models.UserFollow, user models.User) *errHandler.ServiceError {
+	// check if it is self
+	if userFollow.UserID2 == user.UserID {
+		return &errHandler.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: []string{"user: cannot follow yourself"},
+			Err:     errors.New("cannot follow yourself"),
+		}
+	}
 	// check if exist
 	dbUser, err := u.userRepo.GetUserByID(userFollow.UserID2)
 	if err != nil {
@@ -230,6 +238,21 @@ func (u *userUC) Resolve(resolve *dto.ModelResolve, user models.User) *errHandle
 	}
 
 	return &errHandler.ServiceError{
+		Err: nil,
+	}
+}
+
+func (u *userUC) GetFriends(user models.User) ([]dto.Follow, *errHandler.ServiceError) {
+	friends, err := u.userRepo.GetFriends(user)
+	if err != nil {
+		return nil, &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"user: db access error"},
+			Err:     err,
+		}
+	}
+
+	return friends, &errHandler.ServiceError{
 		Err: nil,
 	}
 }

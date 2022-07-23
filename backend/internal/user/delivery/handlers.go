@@ -128,3 +128,19 @@ func (h *userHandlers) Resolve() http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
+func (h *userHandlers) GetFriends() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(middleware.ContextUserKey).(models.User)
+
+		friends, sError := h.userUC.GetFriends(user)
+		if sError.Err != nil {
+			h.logger.Println(sError.Error())
+			sError.ErrorResponse(w)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(friends)
+	}
+}
