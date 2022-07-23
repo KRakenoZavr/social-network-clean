@@ -87,12 +87,27 @@ func (u *groupUC) JoinRequest(gUser *models.GroupUser, user models.User) *errHan
 			Err:     err,
 		}
 	}
-
 	if !isExist {
 		return &errHandler.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: []string{"group user: no group with such id"},
 			Err:     errors.New("group not exists"),
+		}
+	}
+
+	ifAdmin, err := u.groupRepo.CheckAdmin(gUser.GroupID, user.UserID)
+	if err != nil {
+		return &errHandler.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: []string{"group user: db access error"},
+			Err:     err,
+		}
+	}
+	if !ifAdmin {
+		return &errHandler.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: []string{"group user: you are admin"},
+			Err:     errors.New("you are admin"),
 		}
 	}
 
