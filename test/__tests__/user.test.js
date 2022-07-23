@@ -173,9 +173,11 @@ describe('user calls', () => {
 
     it('already registered', async () => {
       expect.assertions(1)
-      return instance.post(`user/register`, mockNormalUser1).catch((err) => {
+      try {
+        await instance.post(`user/register`, mockNormalUser1)
+      } catch (err) {
         expect(err.response.status).toBe(400)
-      })
+      }
     })
   })
 
@@ -188,16 +190,20 @@ describe('user calls', () => {
 
     it('bad login', async () => {
       expect.assertions(1)
-      return instance.post(`user/login`, mockBadLoginUser).catch((err) => {
+      try {
+        await instance.post(`user/login`, mockBadLoginUser)
+      } catch (err) {
         expect(err.response.status).toBe(400)
-      })
+      }
     })
 
     it('bad password', async () => {
       expect.assertions(1)
-      return instance.post(`user/login`, mockBadLoginUser2).catch((err) => {
+      try {
+        await instance.post(`user/login`, mockBadLoginUser2)
+      } catch (err) {
         expect(err.response.status).toBe(400)
-      })
+      }
     })
   })
 })
