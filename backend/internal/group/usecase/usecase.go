@@ -103,7 +103,7 @@ func (u *groupUC) JoinRequest(gUser *models.GroupUser, user models.User) *errHan
 			Err:     err,
 		}
 	}
-	if !ifAdmin {
+	if ifAdmin {
 		return &errHandler.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: []string{"group user: you are admin"},

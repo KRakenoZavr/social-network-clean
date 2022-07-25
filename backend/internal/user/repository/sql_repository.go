@@ -44,6 +44,7 @@ func (r *usersRepo) Create(user *models.User) (models.User, error) {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return models.User{}, err
 	} else {
 		tx.Commit()
 	}
@@ -111,6 +112,7 @@ func (r *usersRepo) CreateUserAuth(userAuth *models.UserAuth) error {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return err
 	} else {
 		tx.Commit()
 	}
@@ -149,6 +151,7 @@ func (r *usersRepo) Follow(userFollow *models.UserFollow, dbUser models.User) er
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return err
 	} else {
 		tx.Commit()
 	}
@@ -206,6 +209,7 @@ func (r *usersRepo) Resolve(resolve *dto.ModelResolve, user models.User) error {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return err
 	} else {
 		tx.Commit()
 	}

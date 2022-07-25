@@ -50,9 +50,10 @@ module.exports = {
             headers: { Cookie: user1.cookie },
           })
           expect(res.status).toBe(200)
+
           groups = res.data
-          group1 = groups.filter((el) => el.title !== normalGroup.title)[0]
-          group2 = groups.filter((el) => el.title !== normalGroup2.title)[0]
+          group1 = groups.filter((el) => el.title === normalGroup.title)[0]
+          group2 = groups.filter((el) => el.title === normalGroup2.title)[0]
 
           const titles = groups.map((el) => el.title)
           expect(titles.includes(normalGroup.title)).toBe(true)
@@ -88,33 +89,40 @@ module.exports = {
         })
 
         it('group join another', async () => {
-          const res = await instance.post(
-            'group/join',
-            { groupID: group2.groupID },
-            {
-              headers: { Cookie: user1.cookie },
-              credentials: 'include',
-            }
-          )
-          expect(res.status).toBe(201)
+          expect.assertions(1)
+          try {
+            await instance.post(
+              'group/join',
+              { groupID: group2.groupID },
+              {
+                headers: { Cookie: user1.cookie },
+                credentials: 'include',
+              }
+            )
+          } catch (err) {
+            expect(err.response.status).toBe(500)
+          }
         })
 
-        it('group check admin invites', async () => {
+        it('bad group check admin invites', async () => {
           const res = await instance.get('group/check-join', {
             headers: { Cookie: user2.cookie },
             credentials: 'include',
           })
 
-          const res2 = await instance.get('group/check-join', {
+          expect(res.status).toBe(200)
+          expect(res.data.length).toBe(1)
+          expect(res.data[0].Email).toBe(mockLoginUser.email)
+        })
+
+        it('good group check admin invites', async () => {
+          const res = await instance.get('group/check-join', {
             headers: { Cookie: user1.cookie },
             credentials: 'include',
           })
 
-          console.log({ res })
-
           expect(res.status).toBe(200)
-
-          console.log({ res2 })
+          expect(res.data).toBe(null)
         })
       })
     }),

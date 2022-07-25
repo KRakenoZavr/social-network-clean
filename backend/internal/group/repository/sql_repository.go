@@ -39,6 +39,7 @@ func (r *groupRepo) Create(group *models.Group) error {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return err
 	} else {
 		tx.Commit()
 	}
@@ -62,6 +63,7 @@ func (r *groupRepo) JoinRequest(gUser *models.GroupUser) error {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return err
 	} else {
 		tx.Commit()
 	}
@@ -181,6 +183,7 @@ func (r *groupRepo) Invite(gUser *models.GroupUser, user models.User) error {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return err
 	} else {
 		tx.Commit()
 	}
@@ -237,6 +240,7 @@ func (r *groupRepo) Resolve(resolve *dto.ModelResolve, user models.User) error {
 		r.logger.Println("doing rollback")
 		r.logger.Println(err.Error())
 		tx.Rollback()
+		return err
 	} else {
 		tx.Commit()
 	}

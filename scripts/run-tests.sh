@@ -72,7 +72,7 @@ killProcess() {
   kill -9 $(lsof -t -i:$BACKEND_PORT)
 
   # Remove test db
-  rm ./backend/$DB_NAME
+  # rm ./backend/$DB_NAME
 
   # Print a message indicating the script has been killed
   echo -e "Everything killed..."
