@@ -104,7 +104,7 @@ module.exports = {
           }
         })
 
-        it('bad group check admin invites', async () => {
+        it('good group check admin invites', async () => {
           const res = await instance.get('group/check-join', {
             headers: { Cookie: user2.cookie },
             credentials: 'include',
@@ -115,7 +115,7 @@ module.exports = {
           expect(res.data[0].Email).toBe(mockLoginUser.email)
         })
 
-        it('good group check admin invites', async () => {
+        it('nothing group check admin invites', async () => {
           const res = await instance.get('group/check-join', {
             headers: { Cookie: user1.cookie },
             credentials: 'include',
